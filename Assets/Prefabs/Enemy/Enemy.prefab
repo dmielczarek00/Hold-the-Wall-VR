@@ -131,3 +131,4 @@ MonoBehaviour:
   path: {fileID: 0}
   speed: 2
   reachDistance: 0.2
+  enemyHeight: 1.6

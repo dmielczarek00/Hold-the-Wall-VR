@@ -1,12 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    public WaypointPath path;         // œcie¿ka
-    public float speed = 2f;          // prêdkoœæ chodzenia
-    public float reachDistance = 0.2f; // jak blisko punktu musi byæ, ¿eby przejœæ dalej
+    public WaypointPath path;
+    public float speed = 2f;
+    public float reachDistance = 0.2f;
+    public float enemyHeight = 1.6f;
 
     private int currentIndex = 0;
 
@@ -15,20 +14,27 @@ public class EnemyMovement : MonoBehaviour
         if (path == null || path.points.Length == 0) return;
 
         Transform targetPoint = path.points[currentIndex];
-        Vector3 dir = (targetPoint.position - transform.position).normalized;
+
+        // spÃ³d przeciwnika
+        Vector3 bottom = transform.position + Vector3.down * (enemyHeight * 0.5f);
+
+        // kierunek ruchu
+        Vector3 dir = (targetPoint.position - bottom).normalized;
         transform.position += dir * speed * Time.deltaTime;
 
-        // obrót w stronê ruchu
-        if (dir.magnitude > 0.01f)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 5);
+        // obrÃ³t w stronÄ™ peÅ‚nego kierunku
+        if (dir.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5);
+        }
 
-        // sprawdŸ czy dotar³ do punktu
-        if (Vector3.Distance(transform.position, targetPoint.position) < reachDistance)
+        // sprawdzanie czy dotarÅ‚
+        if (Vector3.Distance(bottom, targetPoint.position) < reachDistance)
         {
             currentIndex++;
             if (currentIndex >= path.points.Length)
             {
-                // dotar³ do koñca
                 ReachedGoal();
             }
         }
@@ -36,7 +42,6 @@ public class EnemyMovement : MonoBehaviour
 
     void ReachedGoal()
     {
-        Debug.Log("Wróg dotar³ do koñca trasy!");
-        Destroy(gameObject); // usuñ przeciwnika
+        Destroy(gameObject);
     }
 }
