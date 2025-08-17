@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour
 {
     private float speed = 15f;
     private Vector3 direction;
+    public float lifeTime = 5f; // po jakim czasie pocisk od stworzenia pocisk jest usuwany
 
     private DamagePayload payload;
 
@@ -17,6 +18,10 @@ public class Projectile : MonoBehaviour
     {
         direction = (targetPosition - transform.position).normalized;
         transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+    }
+    void Start()
+    {
+        Destroy(gameObject, lifeTime);
     }
 
     void Update()
