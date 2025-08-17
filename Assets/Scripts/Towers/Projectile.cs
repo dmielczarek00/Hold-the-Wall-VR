@@ -5,13 +5,18 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
-    public float speed = 15f;
-    public int damage = 1;
+    private float speed = 15f;
     private Vector3 direction;
+
+    private DamagePayload payload;
+
+    public void SetSpeed(float s) => speed = Mathf.Max(0.001f, s);
+    public void SetPayload(DamagePayload p) => payload = p;
 
     public void SetTarget(Vector3 targetPosition)
     {
         direction = (targetPosition - transform.position).normalized;
+        transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
     }
 
     void Update()
@@ -21,15 +26,12 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        var enemy = other.GetComponent<EnemyMovement>();
-        if (enemy != null)
+        var health = other.GetComponent<EnemyHealth>();
+        if (health != null)
         {
-            Destroy(other.gameObject);
-            Destroy(gameObject);
+            health.TakeDamage(payload.amount, payload.source);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        Destroy(gameObject);
     }
 }

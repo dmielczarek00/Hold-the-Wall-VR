@@ -3,9 +3,11 @@
 public class EnemyMovement : MonoBehaviour
 {
     public WaypointPath path;
+    public Transform aimPoint;
     public float speed = 2f;
     public float reachDistance = 0.2f;
     public float enemyHeight = 1.6f;
+
 
     private int currentIndex = 0;
 

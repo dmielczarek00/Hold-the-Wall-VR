@@ -506,7 +506,15 @@ MonoBehaviour:
   projectilePrefab: {fileID: 3241930599890851996, guid: 677517aede80f1740bb0c5f63fec3752,
     type: 3}
   range: 10
-  fireRate: 0.2
+  fireRate: 1.5
+  accuracy: 0.75
+  maxSpreadAngle: 10
+  baseDamage: 2
+  damagePerLevel: 1
+  level: 1
+  damageMultiplier: 1
+  baseProjectileSpeed: 30
+  projectileSpeedPerLevel: 0
 --- !u!1 &8247905064640179267
 GameObject:
   m_ObjectHideFlags: 0
