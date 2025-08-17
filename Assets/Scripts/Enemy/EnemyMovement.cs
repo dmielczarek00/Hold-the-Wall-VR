@@ -9,6 +9,8 @@ public class EnemyMovement : MonoBehaviour
 
     private int currentIndex = 0;
 
+    public int CurrentIndex => currentIndex;
+
     void Update()
     {
         if (path == null || path.points.Length == 0) return;
