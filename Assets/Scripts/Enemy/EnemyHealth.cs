@@ -35,6 +35,10 @@ public class EnemyHealth : MonoBehaviour
         var move = GetComponent<EnemyMovement>();
         if (move != null) move.enabled = false;
 
+        // wy³¹cz collider
+        var col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
         // animacja œmierci
         if (animator != null && !string.IsNullOrEmpty(deathTrigger))
             animator.SetTrigger(deathTrigger);

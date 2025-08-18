@@ -4,36 +4,23 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
+    [Header("Dane konfiguracyjne")]
+    public TowerData data;
+
+    [Header("Referencje scenowe")]
     public Transform movingPoint;
     public Transform firePoint;
-    public GameObject projectilePrefab;
 
-    public float range = 10f;
-    public float fireRate = 1f;
     private float nextFireTime = 0f;
-
-    [Header("Celnoœæ")]
-    [Range(0f, 1f)]
-    public float accuracy = 1f;       // 1 = idealnie celna, 0 = bardzo niecelna
-    public float maxSpreadAngle = 5f; // maksymalny rozrzut
-
-    [Header("Obra¿enia z wie¿y")]
-    public int baseDamage = 1;
-    public int damagePerLevel = 1;
-    public int level = 1;
-    public float damageMultiplier = 1f;
-
-    [Header("Prêdkoœæ pocisku")]
-    public float baseProjectileSpeed = 15f;
-    public float projectileSpeedPerLevel = 0f;
 
     void Update()
     {
+
         EnemyMovement target = FindClosestEnemy();
 
         if (target != null)
         {
-            // celuje w AimPoint
+            // Celowanie w AimPoint (jeœli jest)
             Vector3 aimPos = target.aimPoint != null
                 ? target.aimPoint.position
                 : target.transform.position;
@@ -42,21 +29,23 @@ public class Tower : MonoBehaviour
             Quaternion lookRot = Quaternion.LookRotation(dir);
             movingPoint.rotation = Quaternion.Slerp(movingPoint.rotation, lookRot, Time.deltaTime * 5);
 
-            // resuje liniê tam gdzie wie¿a celuje
-            float bulletSpeed = CalculateProjectileSpeed();
+            // Podgl¹d linii w kierunku przewidywanego celu
+            float bulletSpeed = Mathf.Max(0.001f, data.projectileSpeed);
             Vector3 predictedPosForDebug = ComputePredictedPos(target, aimPos, bulletSpeed);
             Debug.DrawLine(firePoint.position, predictedPosForDebug, Color.red, 0f, false);
 
             if (Time.time >= nextFireTime)
             {
                 Shoot(target, aimPos, bulletSpeed);
-                nextFireTime = Time.time + 1f / fireRate;
+                nextFireTime = Time.time + 1f / Mathf.Max(0.0001f, data.fireRate);
             }
         }
     }
 
     EnemyMovement FindClosestEnemy()
     {
+        float useRange = data != null ? data.range : 0f;
+
         EnemyMovement[] enemies = FindObjectsOfType<EnemyMovement>();
         EnemyMovement closest = null;
         float minDist = Mathf.Infinity;
@@ -71,7 +60,7 @@ public class Tower : MonoBehaviour
                 continue;
 
             float dist = Vector3.Distance(transform.position, e.transform.position);
-            if (dist < minDist && dist <= range)
+            if (dist < minDist && dist <= useRange)
             {
                 minDist = dist;
                 closest = e;
@@ -81,46 +70,40 @@ public class Tower : MonoBehaviour
         return closest;
     }
 
-    // kalkulacja obra¿eñ
-    int CalculateDamage()
-    {
-        float scaled = (baseDamage + (level - 1) * damagePerLevel) * damageMultiplier;
-        return Mathf.Max(0, Mathf.RoundToInt(scaled));
-    }
-
-    // kalkulacja prêdkoœci pocisku
-    float CalculateProjectileSpeed()
-    {
-        float scaled = (baseProjectileSpeed + (level - 1) * projectileSpeedPerLevel);
-        return Mathf.Max(0.001f, scaled);
-    }
-
     // przewidywanie pozycji przeciwnika
     Vector3 ComputePredictedPos(EnemyMovement enemy, Vector3 aimPosNow, float bulletSpeed)
     {
+        Vector3 r = aimPosNow - firePoint.position;
+
+        // kierunek ruchu wroga
         Vector3 bottomNow = enemy.transform.position + Vector3.down * (enemy.enemyHeight * 0.5f);
         Vector3 toWaypoint = enemy.path.points[enemy.CurrentIndex].position - bottomNow;
         toWaypoint.y = 0f;
-
         Vector3 enemyDir = toWaypoint.sqrMagnitude > 0.0001f ? toWaypoint.normalized : Vector3.zero;
+        Vector3 v = enemyDir * enemy.speed;
 
-        float distance = Vector3.Distance(firePoint.position, aimPosNow);
-        float travelTime = distance / Mathf.Max(0.001f, bulletSpeed);
+        float s = Mathf.Max(0.001f, bulletSpeed);
 
-        return aimPosNow + enemyDir * enemy.speed * travelTime;
+        // pierwszy przybli¿ony czas
+        float t = r.magnitude / s;
+
+        // licz dystans do pozycji po t
+        Vector3 r2 = r + v * t;
+        t = r2.magnitude / s;
+
+        return aimPosNow + v * t;
     }
 
     void Shoot(EnemyMovement enemy, Vector3 aimPosNow, float bulletSpeed)
     {
-        var projObj = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-        Projectile proj = projObj.GetComponent<Projectile>();
+        var projObj = Instantiate(data.projectilePrefab, firePoint.position, firePoint.rotation);
+        var proj = projObj.GetComponent<Projectile>();
         if (proj == null) return;
 
-        // przewidywanie pozycji przeciwnika
-        Vector3 predictedPos = ComputePredictedPos(enemy, aimPosNow, bulletSpeed);
+        Vector3 predictedPos = ComputePredictedPos(enemy, aimPosNow, data.projectileSpeed);
 
         // rozrzut
-        float spread = (1f - accuracy) * maxSpreadAngle;
+        float spread = (1f - Mathf.Clamp01(data.accuracy)) * data.maxSpreadAngle;
         Quaternion spreadRot = Quaternion.Euler(
             Random.Range(-spread, spread),
             Random.Range(-spread, spread),
@@ -130,16 +113,12 @@ public class Tower : MonoBehaviour
         Vector3 dirWithSpread = spreadRot * (predictedPos - firePoint.position);
         Vector3 finalAimPoint = firePoint.position + dirWithSpread;
 
-        // ustaw cel i prêdkoœæ pocisku
-        proj.SetTarget(finalAimPoint);
-        proj.SetSpeed(bulletSpeed);
-
-        // payload z obra¿eniami z wie¿y
         var payload = new DamagePayload
         {
-            amount = CalculateDamage(),
+            amount = Mathf.Max(0, data.damage),
             source = gameObject
         };
-        proj.SetPayload(payload);
+
+        proj.Initialize(finalAimPoint, data.projectileSpeed, data.projectileLifeTime, payload);
     }
 }

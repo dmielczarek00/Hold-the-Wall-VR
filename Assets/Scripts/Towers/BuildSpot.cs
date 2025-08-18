@@ -41,6 +41,10 @@ public class BuildSpot : MonoBehaviour
 
     private void OpenMenu()
     {
-        BuildManager.I.OpenBuildMenu(this, transform.position + Vector3.up * 1.5f);
+        RadialMenu.CloseAll();
+        if (HasTower)
+            BuildManager.I.OpenTowerMenu(this, transform.position + Vector3.up * 2f);
+        else
+            BuildManager.I.OpenBuildMenu(this, transform.position + Vector3.up * 2f);
     }
 }

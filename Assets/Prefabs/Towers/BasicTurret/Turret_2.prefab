@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f252ad98c1ca8240803741807b8ede9, type: 2}
+  - {fileID: 2100000, guid: 72af4645f77412545bcb4303177451de, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -167,7 +167,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a73fe9efd8dfdae43af6b167ab34407d, type: 2}
+  - {fileID: 2100000, guid: ec917d0c367e2774290a9975fabd276e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -307,7 +307,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a73fe9efd8dfdae43af6b167ab34407d, type: 2}
+  - {fileID: 2100000, guid: ec917d0c367e2774290a9975fabd276e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -412,7 +412,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a73fe9efd8dfdae43af6b167ab34407d, type: 2}
+  - {fileID: 2100000, guid: ec917d0c367e2774290a9975fabd276e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -466,7 +466,7 @@ GameObject:
   - component: {fileID: 5900730383126306600}
   - component: {fileID: 5953417681853456816}
   m_Layer: 7
-  m_Name: Turret
+  m_Name: Turret_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -501,7 +501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69892837a30a3c44bb673b31aa7569d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
+  data: {fileID: 11400000, guid: c024fe6a749eb66409b3089fc2c60e9c, type: 2}
   movingPoint: {fileID: 8987940328338224594}
   firePoint: {fileID: 8459241476578720047}
 --- !u!1 &8247905064640179267

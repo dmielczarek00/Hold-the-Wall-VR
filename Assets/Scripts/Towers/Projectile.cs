@@ -5,23 +5,22 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
-    private float speed = 15f;
+    private float speed;
+    private float lifeTime;
     private Vector3 direction;
-    public float lifeTime = 5f; // po jakim czasie pocisk od stworzenia pocisk jest usuwany
 
     private DamagePayload payload;
 
-    public void SetSpeed(float s) => speed = Mathf.Max(0.001f, s);
-    public void SetPayload(DamagePayload p) => payload = p;
-
-    public void SetTarget(Vector3 targetPosition)
+    public void Initialize(Vector3 targetPosition, float speed, float lifeTime, DamagePayload payload)
     {
+        this.speed = Mathf.Max(0.001f, speed);
+        this.lifeTime = Mathf.Max(0.001f, lifeTime);
+        this.payload = payload;
+
         direction = (targetPosition - transform.position).normalized;
         transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
-    }
-    void Start()
-    {
-        Destroy(gameObject, lifeTime);
+
+        Destroy(gameObject, this.lifeTime);
     }
 
     void Update()
