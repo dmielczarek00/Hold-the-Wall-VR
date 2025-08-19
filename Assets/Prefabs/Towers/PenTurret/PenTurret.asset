@@ -19,12 +19,12 @@ MonoBehaviour:
   cost: 50
   sellPercent: 0.8
   range: 10
-  fireRate: 1.5
+  fireRate: 0.8
   armorPenetration: 20
   shred: 0
   accuracy: 0.8
   maxSpreadAngle: 20
-  damage: 5
+  damage: 2
   projectilePrefab: {fileID: 3241930599890851996, guid: a776048a00dcee84ea1127f63e29c90f,
     type: 3}
   projectileSpeed: 15

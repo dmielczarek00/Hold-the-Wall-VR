@@ -1,36 +1,80 @@
 using UnityEngine;
+using System.Collections;
+
+[System.Serializable]
+public class EnemyGroup
+{
+    public GameObject enemyPrefab;
+    public int count;
+    public float interval;
+}
+
+[System.Serializable]
+public class Wave
+{
+    public string name;
+    public EnemyGroup[] groups;
+    public float delayAfterWave = 5f;
+}
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
     public WaypointPath path;
-    public float spawnInterval = 3f;
-    public int maxEnemies = 10;
+    public Wave[] waves;
+    public bool autoStart = true;
 
-    int spawned = 0;
-    float timer = 0;
+    private int currentWave = 0;
+    private bool spawning = false;
 
-    void Update()
+    void Start()
     {
-        if (spawned >= maxEnemies) return;
+        if (autoStart && waves.Length > 0)
+            StartCoroutine(SpawnWave(waves[currentWave]));
+    }
 
-        timer += Time.deltaTime;
-        if (timer >= spawnInterval)
+    public void StartNextWave()
+    {
+        if (spawning || currentWave >= waves.Length) return;
+        StartCoroutine(SpawnWave(waves[currentWave]));
+    }
+
+    private IEnumerator SpawnWave(Wave wave)
+    {
+        spawning = true;
+        Debug.Log("Spawning wave: " + wave.name);
+
+        foreach (var group in wave.groups)
         {
-            timer = 0;
-            var e = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
-
-            var mover = e.GetComponent<EnemyMovement>();
-            if (mover != null)
+            for (int i = 0; i < group.count; i++)
             {
-                mover.path = path;
+                SpawnEnemy(group.enemyPrefab);
+                yield return new WaitForSeconds(group.interval);
             }
-            else
-            {
-                Debug.LogError("Prefab enemy nie ma EnemyMovement!");
-            }
+        }
 
-            spawned++;
+        yield return new WaitForSeconds(wave.delayAfterWave);
+
+        spawning = false;
+        currentWave++;
+
+        if (currentWave < waves.Length)
+        {
+            StartCoroutine(SpawnWave(waves[currentWave]));
+        }
+    }
+
+    private void SpawnEnemy(GameObject prefab)
+    {
+        var e = Instantiate(prefab, transform.position, Quaternion.identity);
+
+        var mover = e.GetComponent<EnemyMovement>();
+        if (mover != null)
+        {
+            mover.path = path;
+        }
+        else
+        {
+            Debug.LogError("Prefab enemy nie ma EnemyMovement!");
         }
     }
 }
