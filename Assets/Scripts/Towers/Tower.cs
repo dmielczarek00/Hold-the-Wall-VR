@@ -116,6 +116,8 @@ public class Tower : MonoBehaviour
         var payload = new DamagePayload
         {
             amount = Mathf.Max(0, data.damage),
+            armorPenetration = Mathf.RoundToInt(data.armorPenetration),
+            shred = Mathf.RoundToInt(data.shred),
             source = gameObject
         };
 

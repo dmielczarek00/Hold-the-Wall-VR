@@ -17,6 +17,8 @@ public class TowerData : ScriptableObject
     [Header("Statystyki wie¿y")]
     public float range = 10f;
     public float fireRate = 1f;
+    public float armorPenetration = 2f;
+    public float shred = 1f;
     [Range(0f, 1f)] public float accuracy = 1f;
     public float maxSpreadAngle = 5f;
 

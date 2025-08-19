@@ -33,7 +33,7 @@ public class Projectile : MonoBehaviour
         var health = other.GetComponent<EnemyHealth>();
         if (health != null)
         {
-            health.TakeDamage(payload.amount, payload.source);
+            health.TakeDamage(payload.amount, payload.armorPenetration, payload.shred);
         }
 
         Destroy(gameObject);

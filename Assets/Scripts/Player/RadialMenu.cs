@@ -155,8 +155,9 @@ public class RadialMenu : MonoBehaviour
                 StatLine("Range", d.range, current?.range) + "\n" +
                 StatLine("Fire rate", d.fireRate, current?.fireRate) + "/s\n" +
                 StatLine("Accuracy", d.accuracy * 100f, current != null ? current.accuracy * 100f : (float?)null, "0") + "%\n" +
-                StatLine("Recoil", d.maxSpreadAngle, current?.maxSpreadAngle) + "°\n" +
                 StatLine("Damage", d.damage, current?.damage, "0") + "\n" +
+                StatLine("Armor Penetration.", d.armorPenetration, current?.armorPenetration, "0") + "\n" +
+                StatLine("Shred", d.shred, current?.shred, "0") + "\n" +
                 StatLine("Projectile Speed", d.projectileSpeed, current?.projectileSpeed);
         }
     }
@@ -262,24 +263,6 @@ public class RadialMenu : MonoBehaviour
             }
             else if (i == 1)
             {
-                // Sell
-                item.SetAsCustom(
-                    sellLabel,
-                    sellIcon,
-                    onClick: () =>
-                    {
-                        if (_spot) BuildManager.I.TrySell(_spot);
-                        Close();
-                    },
-                    onHover: () =>
-                    {
-                        int amt = BuildManager.I.GetSellAmount(_spot);
-                        ShowSellInfo(amt);
-                    }
-                );
-            }
-            else
-            {
                 // Upgrade
                 item.SetAsCustom(
                     upgradeLabel,
@@ -306,6 +289,24 @@ public class RadialMenu : MonoBehaviour
                         }
                     },
                     towerData: _currentTowerData
+                );
+            }
+            else
+            {
+                // Sell
+                item.SetAsCustom(
+                    sellLabel,
+                    sellIcon,
+                    onClick: () =>
+                    {
+                        if (_spot) BuildManager.I.TrySell(_spot);
+                        Close();
+                    },
+                    onHover: () =>
+                    {
+                        int amt = BuildManager.I.GetSellAmount(_spot);
+                        ShowSellInfo(amt);
+                    }
                 );
             }
         }

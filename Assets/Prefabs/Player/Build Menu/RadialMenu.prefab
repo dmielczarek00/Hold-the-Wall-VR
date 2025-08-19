@@ -51,8 +51,8 @@ MonoBehaviour:
     type: 3}
   options:
   - {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
-  - {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
-  - {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
+  - {fileID: 11400000, guid: ab3f61e2fc23d4944996e00687dee576, type: 2}
+  - {fileID: 11400000, guid: 9cb17b8b9614bee4aa5b33a1da9241bc, type: 2}
   - {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
   - {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
   spacing: 40
@@ -60,6 +60,7 @@ MonoBehaviour:
   angleOffset: -90
   menuDistance: 1.5
   menuHeightOffset: 1.8
+  minButtonRadius: 120
   infoRoot: {fileID: 1305451907814600173}
   infoTitle: {fileID: 2896543692549153679}
   infoDesc: {fileID: 8870589223519212041}
