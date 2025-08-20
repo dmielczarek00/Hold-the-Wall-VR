@@ -1,2 +1,9 @@
 Enemy model:
 https://assetstore.unity.com/packages/3d/characters/humanoids/fantasy/free-low-poly-human-rpg-character-219979
+
+Weapons:
+https://lowpolyassets.itch.io/low-poly-medieval-weapons
+
+Decorations:
+https://assetstore.unity.com/packages/3d/environments/landscapes/low-poly-simple-nature-pack-162153
+https://assetstore.unity.com/packages/3d/props/casual-low-poly-tent-pack-created-with-fastmesh-asset-293564

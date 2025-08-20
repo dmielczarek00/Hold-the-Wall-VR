@@ -20,6 +20,11 @@ public class RadialMenu : MonoBehaviour
     public float menuHeightOffset = 1.8f;   // podniesienie menu
     public float minButtonRadius = 120f;    // minimalny odstęp przycisków od środka
 
+    [Tooltip("Przybliżenie gdy gracz jest daleko")]
+    public float distanceFactor = 0.7f;
+    public float minMenuDistance = 1.5f;
+    public float distanceThreshold = 5f;
+
     [Header("Panel info")]
     public GameObject infoRoot;
     public TMP_Text infoTitle;
@@ -94,17 +99,27 @@ public class RadialMenu : MonoBehaviour
     {
         if (Camera.main == null || _spot == null) return;
 
-        Vector3 toCam = (Camera.main.transform.position - _spot.transform.position).normalized;
-        toCam.y = 0f;
+        var cam = Camera.main;
+        Vector3 spotPos = _spot.transform.position;
 
-        if (toCam.sqrMagnitude > 1e-4f)
-        {
-            transform.position = _spot.transform.position
-                               + Vector3.up * menuHeightOffset
-                               + toCam * menuDistance;
+        Vector3 toCam = cam.transform.position - spotPos;
+        if (toCam.sqrMagnitude < 1e-6f) return;
 
-            transform.rotation = Quaternion.LookRotation(-toCam, Vector3.up);
-        }
+        Vector3 dir = toCam.normalized;
+        float camDist = toCam.magnitude;
+
+        float offset = menuDistance;
+        if (camDist > distanceThreshold)
+            offset += (camDist - distanceThreshold) * distanceFactor;
+
+        offset = Mathf.Max(offset, minMenuDistance);
+
+        // Pozycja menu
+        transform.position = spotPos + Vector3.up * menuHeightOffset + dir * offset;
+
+        // Rotacja menu
+        Vector3 lookDir = (transform.position - cam.transform.position).normalized;
+        transform.rotation = Quaternion.LookRotation(lookDir, Vector3.up);
     }
 
     public void OpenActionsFor(BuildSpot spot, TowerData current)
@@ -114,13 +129,7 @@ public class RadialMenu : MonoBehaviour
         BuildButtons_Actions();
         if (infoRoot) infoRoot.SetActive(false);
 
-        if (Camera.main)
-        {
-            Vector3 toCam = Camera.main.transform.position - transform.position;
-            toCam.y = 0f;
-            if (toCam.sqrMagnitude > 1e-4f)
-                transform.rotation = Quaternion.LookRotation(-toCam, Vector3.up);
-        }
+        UpdateMenuTransform();
     }
 
     public void ShowInfo(TowerData d)

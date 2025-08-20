@@ -7,7 +7,7 @@ public class WaypointPath : MonoBehaviour
 
     [Header("Podgląd gizmo")]
     public float enemyRadius = 0.3f;
-    public float enemyHeight = 1.6f;
+    public float enemyHeight = 1.8f;
     public float pathHeightOffset = 0.0f;
 
     void OnDrawGizmos()

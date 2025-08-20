@@ -10,7 +10,7 @@ public class MenuManager : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("LevelOne");
     }
 
     public void OpenOptions(bool open)
