@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3914704294742898143}
   - component: {fileID: 669312613478891315}
   - component: {fileID: 5028129325695762426}
-  - component: {fileID: 8642011584859685693}
+  - component: {fileID: 5729407341240848867}
   m_Layer: 5
-  m_Name: RadialMenuItem
+  m_Name: PlatformRadialMenuItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8642011584859685693
+--- !u!114 &5729407341240848867
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,7 +133,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1637224267734049573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 455e4b8bdb5f1554e92572a01b09c661, type: 3}
+  m_Script: {fileID: 11500000, guid: d5f3062a0f2eb18499183e77921526e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   button: {fileID: 5028129325695762426}
