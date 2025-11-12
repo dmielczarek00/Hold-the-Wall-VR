@@ -23,6 +23,9 @@ public class EnemySpawner : MonoBehaviour
     public Wave[] waves;
     public bool autoStart = true;
 
+    [Header("Drabina")]
+    public EnemyLadder ladderGoal;
+
     private int currentWave = 0;
     private bool spawning = false;
 
@@ -71,6 +74,7 @@ public class EnemySpawner : MonoBehaviour
         if (mover != null)
         {
             mover.path = path;
+            mover.ladderGoal = ladderGoal;
         }
         else
         {

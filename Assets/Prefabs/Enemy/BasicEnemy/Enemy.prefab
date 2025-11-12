@@ -50,6 +50,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 3
   currentHealth: 0
+  maxArmor: 0
+  currentArmor: 0
+  smallArmorShare: 20
+  mediumArmorShare: 20
+  bigArmorShare: 60
+  smallArmorPieces: []
+  mediumArmorPieces: []
+  bigArmorPieces: []
   animator: {fileID: 7823660817190847058}
   deathTrigger: Death
   deathLifetime: 3
@@ -70,6 +78,8 @@ MonoBehaviour:
   speed: 4
   reachDistance: 0.2
   enemyHeight: 1.9
+  animator: {fileID: 7823660817190847058}
+  ladderGoal: {fileID: 0}
 --- !u!65 &7797394382159677638
 BoxCollider:
   m_ObjectHideFlags: 0

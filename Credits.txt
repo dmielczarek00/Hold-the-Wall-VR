@@ -7,3 +7,6 @@ https://lowpolyassets.itch.io/low-poly-medieval-weapons
 Decorations:
 https://assetstore.unity.com/packages/3d/environments/landscapes/low-poly-simple-nature-pack-162153
 https://assetstore.unity.com/packages/3d/props/casual-low-poly-tent-pack-created-with-fastmesh-asset-293564
+
+Climbing animations:
+https://www.mixamo.com/#/?page=1&query=ladder&type=Motion%2CMotionPack

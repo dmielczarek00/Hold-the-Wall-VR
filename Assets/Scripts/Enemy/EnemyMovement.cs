@@ -8,13 +8,40 @@ public class EnemyMovement : MonoBehaviour
     public float reachDistance = 0.2f;
     public float enemyHeight = 1.6f;
 
+    public Animator animator;
+
+    [Header("Drabina")]
+    public EnemyLadder ladderGoal;
 
     private int currentIndex = 0;
 
     public int CurrentIndex => currentIndex;
 
+    private bool _isClimbing;
+    private EnemyLadder _currentLadder;
+    private float _climbTimer;
+
+    private float _baseYaw;
+
+    private bool _isExitingLadder;
+
+    private bool _prevRootMotion;
+    private bool _didMatchOnExit;
+
     void Update()
     {
+        if (_isClimbing)
+        {
+            HandleClimb();
+            return;
+        }
+
+        if (_isExitingLadder)
+        {
+            HandleLadderExit();
+            return;
+        }
+
         if (path == null || path.points.Length == 0) return;
 
         Transform targetPoint = path.points[currentIndex];
@@ -26,7 +53,7 @@ public class EnemyMovement : MonoBehaviour
         Vector3 dir = (targetPoint.position - bottom).normalized;
         transform.position += dir * speed * Time.deltaTime;
 
-        // obrót w stronę pełnego kierunku
+        // obrót w stronę kierunku przemieszczania się
         if (dir.sqrMagnitude > 0.001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(dir);
@@ -44,8 +71,174 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
+    // dotarcie do celu
     void ReachedGoal()
     {
+        if (ladderGoal != null)
+        {
+            StartClimb(ladderGoal);
+            return;
+        }
+
         Destroy(gameObject);
+    }
+
+    // rozpoczęcie wspinaczki
+    void StartClimb(EnemyLadder ladder)
+    {
+        _isClimbing = true;
+        _currentLadder = ladder;
+        _climbTimer = 0f;
+
+        // kierunek przed wejściem na drabinę
+        _baseYaw = transform.eulerAngles.y;
+
+        if (_currentLadder.bottomPoint != null)
+        {
+            transform.position = _currentLadder.bottomPoint.position;
+
+            Vector3 toBottom = (_currentLadder.bottomPoint.position - transform.position).normalized;
+
+            Quaternion yawRot = Quaternion.Euler(0f, _baseYaw, 0f);
+            if (toBottom.sqrMagnitude > 0.0001f)
+            {
+                Vector3 up0 = yawRot * Vector3.up;
+                Vector3 right0 = yawRot * Vector3.right;
+
+                float pitch = Vector3.SignedAngle(up0, -toBottom, right0);
+                Quaternion tiltRot = Quaternion.AngleAxis(pitch, right0);
+
+                transform.rotation = tiltRot * yawRot;
+            }
+            else
+            {
+                transform.rotation = yawRot;
+            }
+        }
+
+        // animacja wspianczki
+        if (animator != null)
+            animator.SetBool("Climb", true);
+    }
+
+    // wspinaczka
+    void HandleClimb()
+    {
+        if (_currentLadder == null || _currentLadder.bottomPoint == null || _currentLadder.topPoint == null)
+        {
+            _isClimbing = false;
+            Destroy(gameObject);
+            return;
+        }
+
+        _climbTimer += Time.deltaTime;
+        float duration = Mathf.Max(0.01f, _currentLadder.climbDuration);
+        float t = Mathf.Clamp01(_climbTimer / duration);
+
+        Vector3 startPos = _currentLadder.bottomPoint.position;
+        Vector3 endPos = _currentLadder.topPoint.position;
+
+        transform.position = Vector3.Lerp(startPos, endPos, t);
+
+        // obrót podczas wspinaczki żeby dół przeciwnika był skierowany w stronę dołu drabiny
+        Vector3 toBottom = (_currentLadder.bottomPoint.position - transform.position).normalized;
+
+        Quaternion yawRot = Quaternion.Euler(0f, _baseYaw, 0f);
+        if (toBottom.sqrMagnitude > 0.0001f)
+        {
+            Vector3 up0 = yawRot * Vector3.up;
+            Vector3 right0 = yawRot * Vector3.right;
+
+            float pitch = Vector3.SignedAngle(up0, -toBottom, right0);
+            Quaternion tiltRot = Quaternion.AngleAxis(pitch, right0);
+
+            transform.rotation = tiltRot * yawRot;
+        }
+        else
+        {
+            transform.rotation = yawRot;
+        }
+
+        if (t >= 1f)
+        {
+            _isClimbing = false;
+
+            // wyłączenie animacji wspinaczki
+            if (animator != null)
+                animator.SetBool("Climb", false);
+
+            StartLadderExit();
+        }
+    }
+
+    void StartLadderExit()
+    {
+        _isExitingLadder = true;
+        _didMatchOnExit = false;
+
+        if (animator != null)
+        {
+            _prevRootMotion = animator.applyRootMotion;
+            animator.applyRootMotion = true;
+
+            animator.SetTrigger("LadderExit");
+        }
+    }
+
+    void HandleLadderExit()
+    {
+        if (_currentLadder == null)
+        {
+            _isExitingLadder = false;
+            if (animator != null) animator.applyRootMotion = _prevRootMotion;
+            Destroy(gameObject);
+            return;
+        }
+
+
+        bool endByAnim = false;
+        if (animator != null)
+        {
+            var st = animator.GetCurrentAnimatorStateInfo(0);
+            if (st.IsName("LadderExit") && st.normalizedTime >= 1f) endByAnim = true;
+        }
+
+        if (endByAnim)
+        {
+            _isExitingLadder = false;
+            if (animator != null) animator.applyRootMotion = _prevRootMotion;
+            Destroy(gameObject);
+        }
+    }
+
+    void OnAnimatorMove()
+    {
+        if (animator == null) return;
+
+        if (_isExitingLadder)
+        {
+            var st = animator.GetCurrentAnimatorStateInfo(0);
+            if (!_didMatchOnExit && st.IsName("LadderExit") && st.normalizedTime < 0.15f && _currentLadder != null)
+            {
+                var pos = _currentLadder.topPoint.position;
+
+                var rot = transform.rotation;
+                var weightMask = new MatchTargetWeightMask(new Vector3(1f, 0f, 1f), 0f);
+
+                animator.MatchTarget(
+                    pos,
+                    rot,
+                    AvatarTarget.Root,
+                    weightMask,
+                    0f,
+                    0.15f
+                );
+
+                _didMatchOnExit = true;
+            }
+
+            transform.position += animator.deltaPosition;
+            transform.rotation = animator.deltaRotation * transform.rotation;
+        }
     }
 }
