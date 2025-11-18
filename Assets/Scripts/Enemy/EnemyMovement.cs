@@ -44,20 +44,39 @@ public class EnemyMovement : MonoBehaviour
 
         if (path == null || path.points.Length == 0) return;
 
+        if (currentIndex < 0 || currentIndex >= path.points.Length)
+        {
+            return;
+        }
+
         Transform targetPoint = path.points[currentIndex];
 
         // spód przeciwnika
         Vector3 bottom = transform.position + Vector3.down * (enemyHeight * 0.5f);
 
-        // kierunek ruchu
-        Vector3 dir = (targetPoint.position - bottom).normalized;
-        transform.position += dir * speed * Time.deltaTime;
+        // kierunek ruchu (wektor do celu)
+        Vector3 toTarget = targetPoint.position - bottom;
 
-        // obrót w stronę kierunku przemieszczania się
-        if (dir.sqrMagnitude > 0.001f)
+        // domyślnie stoi
+        float moveSpeed = 0f;
+
+        if (toTarget.sqrMagnitude > 0.0001f)
         {
-            Quaternion targetRot = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5);
+            Vector3 dir = toTarget.normalized;
+
+            // przesunięcie po ścieżce
+            transform.position += dir * speed * Time.deltaTime;
+            moveSpeed = speed;
+
+            // obrót w stronę ruchu
+            Quaternion targetRot = Quaternion.LookRotation(dir, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5f);
+        }
+
+        // ustaw animację chodzenia
+        if (animator != null)
+        {
+            animator.SetFloat("MoveSpeed", moveSpeed);
         }
 
         // sprawdzanie czy dotarł
@@ -207,10 +226,20 @@ public class EnemyMovement : MonoBehaviour
         {
             _isExitingLadder = false;
             if (animator != null) animator.applyRootMotion = _prevRootMotion;
-            Destroy(gameObject);
+
+            SnapToGround();
+
+            var combat = GetComponent<EnemyCombatController>();
+            if (combat != null)
+            {
+                combat.BeginCombat();
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
     }
-
     void OnAnimatorMove()
     {
         if (animator == null) return;
@@ -239,6 +268,21 @@ public class EnemyMovement : MonoBehaviour
 
             transform.position += animator.deltaPosition;
             transform.rotation = animator.deltaRotation * transform.rotation;
+        }
+    }
+    private void SnapToGround()
+    {
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+
+        if (Physics.Raycast(origin, Vector3.down, out var hit, 2f))
+        {
+            Vector3 pos = transform.position;
+
+            float halfHeight = enemyHeight * 0.5f;
+
+            pos.y = hit.point.y + halfHeight;
+
+            transform.position = pos;
         }
     }
 }
