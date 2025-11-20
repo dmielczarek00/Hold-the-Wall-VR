@@ -96,6 +96,20 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
+    public void TakeBodyDamage(int damage)
+    {
+        if (IsDead) return;
+        if (damage <= 0) return;
+
+        currentHealth -= damage;
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+
     void Die()
     {
         if (IsDead) return;

@@ -32,6 +32,25 @@ public class EnemyCombatController : MonoBehaviour
     public float attackIntervalMin = 2f;
     public float attackIntervalMax = 4f;
 
+    [Header("Reakcja na obrażenia")]
+    public string hitTrigger = "Hit";
+    public string stunTrigger = "Stun";
+    public string stunEndTrigger = "StunEnd";
+    public string hitSideParam = "HitSide";
+
+    public float fleshStunDuration = 0.6f;
+    public float armorStunDuration = 0.3f;
+
+    [Range(0f, 1f)] public float fleshStunChance = 0.3f;
+    [Range(0f, 1f)] public float armorStunChance = 0.2f;
+
+    [SerializeField] private float moveSpeedDampTime = 0.25f;
+
+    private bool _isStunned;
+    private float _stunTimer;
+
+    public bool IsStunned => _isStunned;
+
     private enum CombatState
     {
         Inactive,
@@ -45,6 +64,8 @@ public class EnemyCombatController : MonoBehaviour
 
     private EnemyMovement _movement;
     private Animator _animator;
+    private EnemyHealth _health;
+    private bool _isDead;
 
     private Collider _rootCollider;
     private Collider[] _childColliders;
@@ -53,6 +74,7 @@ public class EnemyCombatController : MonoBehaviour
     private static readonly List<EnemyCombatController> _allEnemies =
         new List<EnemyCombatController>();
 
+    // INIT
     void Awake()
     {
         _movement = GetComponent<EnemyMovement>();
@@ -61,6 +83,8 @@ public class EnemyCombatController : MonoBehaviour
 
         if (_animator == null)
             _animator = GetComponentInChildren<Animator>();
+
+        _health = GetComponent<EnemyHealth>();
 
         // domyślnie kamera jako cel
         if (playerTarget == null)
@@ -103,10 +127,48 @@ public class EnemyCombatController : MonoBehaviour
         _currentAttackInterval = Random.Range(attackIntervalMin, attackIntervalMax);
     }
 
+    // helper do płynnego ustawiania parametru prędkości w animatorze
+    private void SetMoveSpeed(float speed)
+    {
+        if (_animator == null) return;
+        _animator.SetFloat("MoveSpeed", speed, moveSpeedDampTime, Time.deltaTime);
+    }
+
     void Update()
     {
+        if (_isDead) return;
+
+        if (_health != null && _health.IsDead)
+        {
+            _isDead = true;
+            _state = CombatState.Inactive;
+            SetMoveSpeed(0f);
+            return;
+        }
+
+        // stan ogłuszenia – brak ruchu i czekanie na koniec
+        if (_isStunned)
+        {
+            _stunTimer -= Time.deltaTime;
+            if (_stunTimer <= 0f)
+            {
+                _stunTimer = 0f;
+                _isStunned = false;
+
+                // koniec stuna – trigger do wyjścia ze stanu Stun w animatorze
+                if (_animator != null && !string.IsNullOrEmpty(stunEndTrigger))
+                    _animator.SetTrigger(stunEndTrigger);
+            }
+
+            SetMoveSpeed(0f);
+            return;
+        }
+
         if (_state == CombatState.Inactive) return;
         if (playerTarget == null) return;
+
+        // jeśli aktualnie leci animacja ataku, logika ruchu jest pomijana
+        if (IsAttacking()) return;
 
         switch (_state)
         {
@@ -122,11 +184,15 @@ public class EnemyCombatController : MonoBehaviour
     // przejście w tryb walki wręcz
     public void BeginCombat()
     {
+        if (_isDead) return;
         if (playerTarget == null)
         {
             Debug.LogWarning("EnemyCombatController: Brak playerTarget.");
             return;
         }
+
+        if (_movement != null)
+            _movement.enabled = false;
 
         SetMeleeModeColliders();
 
@@ -134,33 +200,46 @@ public class EnemyCombatController : MonoBehaviour
         _attackTimer = 0f;
         _currentAttackInterval = Random.Range(attackIntervalMin, attackIntervalMax);
 
-        if (_animator != null)
-            _animator.SetFloat("MoveSpeed", 0f);
+        SetMoveSpeed(0f);
     }
 
     public void StopCombat()
     {
+        if (_movement != null)
+            _movement.enabled = true;
+
         _state = CombatState.Inactive;
     }
 
     // ruch i ustawianie się wokół gracza
     private void UpdateApproach()
     {
+        if (_isStunned) return;
+        if (IsAttacking()) return;
+
         Vector3 enemyPos = transform.position;
         Vector3 playerPos = playerTarget.position;
 
         Vector3 toPlayer = playerPos - enemyPos;
         toPlayer.y = 0f;
-        float distToPlayer = toPlayer.magnitude;
-        if (distToPlayer < 0.001f) return;
+        float dist = toPlayer.magnitude;
+        if (dist < 0.001f) return;
 
-        Vector3 dirToPlayer = toPlayer / distToPlayer;
+        Vector3 dirToPlayer = toPlayer / dist;
         bool isFrontline = IsFrontline();
 
         // odległość od gracza dla pierwszego / drugiego rzędu
         float targetDistFromPlayer = isFrontline
             ? stopDistance
             : stopDistance + backRowDistanceOffset;
+
+        // jeśli nikt jeszcze nie doszedł do gracza – ten wróg idzie prosto
+        if (NoOneReachedPlayerYet())
+        {
+            Vector3 straightPos = playerPos - dirToPlayer * targetDistFromPlayer;
+            MoveDirect(straightPos);
+            return;
+        }
 
         // bazowa pozycja przed graczem na linii wróg–gracz
         Vector3 basePos = playerPos - dirToPlayer * targetDistFromPlayer;
@@ -173,12 +252,12 @@ public class EnemyCombatController : MonoBehaviour
         if (laneIndex == 1) sideSign = 1f;
         else if (laneIndex == 2) sideSign = -1f;
 
-        float lateral = lateralOffset;
+        float lateralBase = lateralOffset;
         if (!isFrontline)
-            lateral *= 0.7f;
+            lateralBase *= 0.7f;
 
         Vector3 sideDir = Vector3.Cross(Vector3.up, dirToPlayer);
-        Vector3 desiredPos = basePos + sideDir * sideSign * lateral;
+        Vector3 desiredPos = basePos + sideDir * sideSign * lateralBase;
 
         // obcięcie do areny
         if (FightManager.Instance != null)
@@ -186,51 +265,51 @@ public class EnemyCombatController : MonoBehaviour
 
         // wybór najlepszego miejsca w okolicy – szukamy pozycji z dobrym odstępem od innych
         Vector3 bestPos = FindBestTargetPosition(desiredPos, dirToPlayer, sideDir, isFrontline);
+        MoveDirect(bestPos);
+    }
 
-        Vector3 toTargetPos = bestPos - enemyPos;
-        toTargetPos.y = 0f;
-        float distToTargetPos = toTargetPos.magnitude;
+    // prosty ruch do wskazanego punktu na płaszczyźnie XZ
+    private void MoveDirect(Vector3 targetPos)
+    {
+        Vector3 pos = transform.position;
 
-        float moveSpeed = 0f;
+        // trzymanie się płaszczyzny XZ
+        targetPos.y = pos.y;
 
-        if (distToTargetPos > 0.05f)
+        Vector3 toTarget = targetPos - pos;
+        toTarget.y = 0f;
+        float dist = toTarget.magnitude;
+
+        float speed = 0f;
+
+        if (dist > 0.05f)
         {
-            // kierunek ruchu do wybranej pozycji
-            Vector3 moveDirToTarget = toTargetPos.normalized;
-            float speed = isFrontline ? combatMoveSpeed : combatMoveSpeed * backRowSpeedFactor;
+            Vector3 moveDir = toTarget.normalized;
+            Vector3 newPos = pos + moveDir * combatMoveSpeed * Time.deltaTime;
+            newPos.y = pos.y;
 
-            Vector3 newPos = enemyPos + moveDirToTarget * speed * Time.deltaTime;
-            newPos.y = enemyPos.y;
-
-            // pilnowanie minimalnego odstępu od innych
             newPos = EnforceSeparation(newPos);
 
             if (FightManager.Instance != null)
                 newPos = FightManager.Instance.ClampToArena(newPos);
 
             transform.position = newPos;
-            moveSpeed = speed;
+            speed = combatMoveSpeed;
 
-            // w ruchu patrzymy w kierunku poruszania się
-            if (moveDirToTarget.sqrMagnitude > 0.0001f)
+            // obrót tylko po Y w kierunku ruchu / celu
+            Vector3 flatLook = targetPos - newPos;
+            flatLook.y = 0f;
+            if (flatLook.sqrMagnitude > 0.0001f)
             {
-                Quaternion lookRot = Quaternion.LookRotation(moveDirToTarget, Vector3.up);
-                transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.deltaTime * 10f);
+                Quaternion rot = Quaternion.LookRotation(flatLook.normalized, Vector3.up);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, 10f * Time.deltaTime);
             }
         }
-        else
-        {
-            // przy małym ruchu po prostu patrzy na gracza
-            Quaternion lookRot = Quaternion.LookRotation(dirToPlayer, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.deltaTime * 10f);
-        }
 
-        // animacja chodzenia / stania
-        if (_animator != null)
-            _animator.SetFloat("MoveSpeed", moveSpeed, 0.5f, Time.deltaTime);
+        SetMoveSpeed(speed);
 
-        // wejście w tryb ataku tylko dla pierwszego rzędu w zasięgu
-        if (isFrontline && distToPlayer <= attackRange)
+        float distToPlayer = (playerTarget.position - transform.position).magnitude;
+        if (distToPlayer <= attackRange && IsFrontline())
         {
             _state = CombatState.AttackLoop;
             _attackTimer = 0f;
@@ -238,9 +317,12 @@ public class EnemyCombatController : MonoBehaviour
         }
     }
 
-    // tryb ataku – wróg stoi przy graczu i co jakiś czas robi animację ataku
+    // tryb ataku – wróg stoi przy graczu i co jakiś czas wykonuje animację ataku
     private void UpdateAttackLoop()
     {
+        if (_isStunned) return;
+        if (IsAttacking()) return;
+
         Vector3 enemyPos = transform.position;
         Vector3 targetPos = playerTarget.position;
 
@@ -248,67 +330,21 @@ public class EnemyCombatController : MonoBehaviour
         toTarget.y = 0f;
         float dist = toTarget.magnitude;
 
+        // jeśli wróg się za bardzo oddalił lub przestał być w pierwszym rzędzie – wraca do podejścia
+        if (dist > attackRange * 2f || !IsFrontline())
+        {
+            _state = CombatState.Approach;
+            return;
+        }
+
         if (toTarget.sqrMagnitude > 0.0001f)
         {
             Vector3 dirToPlayer = toTarget / Mathf.Max(dist, 0.0001f);
-
-            // jak się oddali to wraca do podchodzenia
-            float hardExitDistance = attackRange * 2.0f;
-            if (dist > hardExitDistance)
-            {
-                _state = CombatState.Approach;
-                return;
-            }
-
-            // jeśli przestał być w pierwszym rzędzie wraca do podejścia
-            if (!IsFrontline())
-            {
-                _state = CombatState.Approach;
-                return;
-            }
-
-            // delikatne korygowanie dystansu w miejscu
-            float desiredDist = stopDistance;
-            float band = 0.3f;
-            float moveSpeed = 0f;
-            Vector3 move = Vector3.zero;
-
-            if (dist > desiredDist + band)
-            {
-                // odrobinę podejdź do gracza
-                Vector3 moveDir = dirToPlayer;
-                move = moveDir * (combatMoveSpeed * 0.5f * Time.deltaTime);
-                moveSpeed = combatMoveSpeed * 0.5f;
-            }
-            else if (dist < desiredDist - band)
-            {
-                // odrobinę odsuń się od gracza
-                Vector3 moveDir = -dirToPlayer;
-                move = moveDir * (combatMoveSpeed * 0.5f * Time.deltaTime);
-                moveSpeed = combatMoveSpeed * 0.5f;
-            }
-
-            if (move != Vector3.zero)
-            {
-                Vector3 newPos = enemyPos + move;
-                newPos.y = enemyPos.y;
-
-                newPos = EnforceSeparation(newPos);
-
-                if (FightManager.Instance != null)
-                    newPos = FightManager.Instance.ClampToArena(newPos);
-
-                transform.position = newPos;
-            }
-
-            // animacja – lekki ruch lub pełne stanie
-            if (_animator != null)
-                _animator.SetFloat("MoveSpeed", moveSpeed, 0.3f, Time.deltaTime);
-
-            // w trybie ataku zawsze patrzymy na gracza
             Quaternion look = Quaternion.LookRotation(dirToPlayer, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, look, Time.deltaTime * 10f);
         }
+
+        SetMoveSpeed(0f);
 
         // odliczanie czasu do kolejnego ataku
         _attackTimer += Time.deltaTime;
@@ -325,6 +361,90 @@ public class EnemyCombatController : MonoBehaviour
                 _animator.CrossFade(stateName, attackCrossfadeDuration, 0, 0f);
             }
         }
+    }
+
+    // reakcja na cios – wybór strony uderzenia
+    public void PlayHitReaction(Vector3 worldHitDir)
+    {
+        if (_animator == null) return;
+
+        // awaryjny kierunek, gdyby przyszło coś bez długości
+        if (worldHitDir.sqrMagnitude < 0.0001f)
+            worldHitDir = -transform.forward;
+
+        // przeliczenie na lokalny układ wroga
+        Vector3 local = transform.InverseTransformDirection(worldHitDir);
+        local.y = 0f;
+
+        if (local.sqrMagnitude > 0.0001f)
+            local.Normalize();
+
+        float side = Mathf.Clamp(local.x, -1f, 1f);
+
+        if (!string.IsNullOrEmpty(hitSideParam))
+            _animator.SetFloat(hitSideParam, side);
+
+        if (!string.IsNullOrEmpty(hitTrigger))
+            _animator.SetTrigger(hitTrigger);
+    }
+
+    // ustawienie stuna – zatrzymanie ruchu i odpalenie animacji
+    public void ApplyStun(float duration)
+    {
+        if (duration <= 0f) return;
+        if (_isDead) return;
+
+        _isStunned = true;
+        _stunTimer = Mathf.Max(_stunTimer, duration);
+
+        if (!string.IsNullOrEmpty(stunTrigger) && _animator != null)
+            _animator.SetTrigger(stunTrigger);
+    }
+
+    // tryb walki wręcz – wyłączenie głównego collidra, włączenie childów
+    private void SetMeleeModeColliders()
+    {
+        if (_rootCollider != null)
+            _rootCollider.enabled = false;
+
+        if (_childColliders == null) return;
+
+        foreach (var col in _childColliders)
+        {
+            if (col == null) continue;
+            col.enabled = true;
+        }
+    }
+
+    // czy nikt jeszcze nie doszedł wystarczająco blisko gracza
+    private bool NoOneReachedPlayerYet()
+    {
+        foreach (var e in _allEnemies)
+        {
+            if (e == null || e == this) continue;
+            if (e._state != CombatState.Approach && e._state != CombatState.AttackLoop) continue;
+
+            float dist = (e.transform.position - playerTarget.position).magnitude;
+            if (dist <= stopDistance + 0.3f)
+                return false;
+        }
+        return true;
+    }
+
+    // sprawdzenie czy aktualny stan animatora to któryś z ataków
+    private bool IsAttacking()
+    {
+        if (_animator == null) return false;
+
+        var st = _animator.GetCurrentAnimatorStateInfo(0);
+
+        if (attackStateNames == null) return false;
+
+        foreach (var s in attackStateNames)
+            if (st.IsName(s))
+                return true;
+
+        return false;
     }
 
     // ranking po dystansie – ile wrogów jest bliżej gracza niż ten
@@ -346,7 +466,7 @@ public class EnemyCombatController : MonoBehaviour
 
             float otherDistSqr = (other.transform.position - playerPos).sqrMagnitude;
 
-            // mały margines, żeby nie przeskakiwali ciągle miejscami
+            // mały margines, żeby nie przeskakiwali ciągle miejscami (~5 cm)
             if (otherDistSqr < myDistSqr - 0.05f * 0.05f)
                 rank++;
         }
@@ -399,7 +519,7 @@ public class EnemyCombatController : MonoBehaviour
             float minDist = ComputeMinDistanceToOthers(candidate);
             float distToDesired = (candidate - desiredPos).magnitude;
 
-            // możliwie duży odstęp od innych
+            // możliwie duży odstęp od innych z niewielką karą za oddalenie od pozycji idealnej
             float score = minDist - distToDesired * 0.3f;
 
             if (score > bestScore)
@@ -463,21 +583,5 @@ public class EnemyCombatController : MonoBehaviour
 
         corrected.y = proposedPos.y;
         return corrected;
-    }
-
-
-    // tryb walki wręcz
-    void SetMeleeModeColliders()
-    {
-        if (_rootCollider != null)
-            _rootCollider.enabled = false;
-
-        if (_childColliders == null) return;
-
-        foreach (var col in _childColliders)
-        {
-            if (col == null) continue;
-            col.enabled = true;
-        }
     }
 }

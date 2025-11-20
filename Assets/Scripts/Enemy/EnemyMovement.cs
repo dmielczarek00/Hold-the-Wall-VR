@@ -232,6 +232,7 @@ public class EnemyMovement : MonoBehaviour
             var combat = GetComponent<EnemyCombatController>();
             if (combat != null)
             {
+                combat.enabled = true;
                 combat.BeginCombat();
             }
             else
