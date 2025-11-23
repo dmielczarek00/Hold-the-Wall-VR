@@ -1983,7 +1983,7 @@
                     "name": "Activate",
                     "type": "Button",
                     "id": "41976d89-60de-4deb-bff9-16b4af96b290",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -2068,6 +2068,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Sword",
+                    "type": "Button",
+                    "id": "bc04c2d1-6bc0-453b-9a81-01f504b9bfac",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -2378,6 +2387,28 @@
                     "action": "Translate Manipulation",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a18c19a-700e-4124-a60c-d94a50cb1a9d",
+                    "path": "<OculusTouchController>/secondaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Sword",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "20ad7cbd-72b0-4b5e-9ff0-4ea2e4e4603c",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Sword",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -2434,7 +2465,7 @@
                     "name": "Grab Move",
                     "type": "Button",
                     "id": "cfb29d37-3db0-4e5d-a73b-7d48a19e279e",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -2443,7 +2474,7 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "01c7fda4-9c15-4167-8b87-58024f21d903",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

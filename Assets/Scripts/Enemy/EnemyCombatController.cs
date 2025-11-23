@@ -7,7 +7,7 @@ public class EnemyCombatController : MonoBehaviour
     public Transform playerTarget;
 
     [Header("Ruch w walce")]
-    public float combatMoveSpeed = 2f;
+    public float combatMoveSpeed = 4f;
     public float backRowSpeedFactor = 0.3f;
 
     [Tooltip("Zasięg, w którym wróg może zacząć atak.")]
@@ -32,6 +32,9 @@ public class EnemyCombatController : MonoBehaviour
     public float attackIntervalMin = 2f;
     public float attackIntervalMax = 4f;
 
+    [Header("Broń")]
+    public EnemyWeapon enemyWeapon;
+
     [Header("Reakcja na obrażenia")]
     public string hitTrigger = "Hit";
     public string stunTrigger = "Stun";
@@ -45,6 +48,8 @@ public class EnemyCombatController : MonoBehaviour
     [Range(0f, 1f)] public float armorStunChance = 0.2f;
 
     [SerializeField] private float moveSpeedDampTime = 0.25f;
+
+    private bool _attackHitWindowActive;
 
     private bool _isStunned;
     private float _stunTimer;
@@ -110,6 +115,9 @@ public class EnemyCombatController : MonoBehaviour
 
         if (!_allEnemies.Contains(this))
             _allEnemies.Add(this);
+
+            if (enemyWeapon == null)
+        enemyWeapon = GetComponentInChildren<EnemyWeapon>();
     }
 
     void OnDestroy()
@@ -167,8 +175,23 @@ public class EnemyCombatController : MonoBehaviour
         if (_state == CombatState.Inactive) return;
         if (playerTarget == null) return;
 
-        // jeśli aktualnie leci animacja ataku, logika ruchu jest pomijana
-        if (IsAttacking()) return;
+        bool isAttackingNow = IsAttacking();
+
+        if (enemyWeapon != null)
+        {
+            if (isAttackingNow && !_attackHitWindowActive)
+            {
+                _attackHitWindowActive = true;
+                enemyWeapon.BeginHitWindow();
+            }
+            else if (!isAttackingNow && _attackHitWindowActive)
+            {
+                _attackHitWindowActive = false;
+                enemyWeapon.EndHitWindow();
+            }
+        }
+
+        if (isAttackingNow) return;
 
         switch (_state)
         {
@@ -425,7 +448,7 @@ public class EnemyCombatController : MonoBehaviour
             if (e._state != CombatState.Approach && e._state != CombatState.AttackLoop) continue;
 
             float dist = (e.transform.position - playerTarget.position).magnitude;
-            if (dist <= stopDistance + 0.3f)
+            if (dist <= stopDistance + 0.5f)
                 return false;
         }
         return true;

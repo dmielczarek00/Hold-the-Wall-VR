@@ -11,11 +11,12 @@ public class EnemyWeapon : MonoBehaviour
 
     private bool _hitWindowActive;
     private float _nextAllowedDamageTime;
+    private bool _hasHitInThisWindow;
 
-    // te metody wywo³ujesz z eventów animacji
     public void BeginHitWindow()
     {
         _hitWindowActive = true;
+        _hasHitInThisWindow = false;
     }
 
     public void EndHitWindow()
@@ -26,17 +27,17 @@ public class EnemyWeapon : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!_hitWindowActive) return;
-
-        // globalny cooldown na dmg
+        if (_hasHitInThisWindow) return;
         if (Time.time < _nextAllowedDamageTime) return;
 
-        if (other.CompareTag(playerBodyTag))
-        {
-            // TODO: odbieranie HP graczowi
+        if (!other.CompareTag(playerBodyTag)) return;
 
-            Debug.Log($"EnemyWeapon: trafiono gracza za {damage}");
+        PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+        if (health == null) return;
 
-            _nextAllowedDamageTime = Time.time + damageCooldown;
-        }
+        health.TakeDamage(damage);
+
+        _hasHitInThisWindow = true;
+        _nextAllowedDamageTime = Time.time + damageCooldown;
     }
 }

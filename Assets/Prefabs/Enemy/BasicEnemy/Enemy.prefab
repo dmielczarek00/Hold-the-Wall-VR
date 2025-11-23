@@ -538,18 +538,19 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   combatMoveSpeed: 4
   backRowSpeedFactor: 0.3
-  attackRange: 1.5
-  stopDistance: 1.3
+  attackRange: 1.3
+  stopDistance: 0.9
   backRowDistanceOffset: 1.2
   minDistanceFromOtherEnemies: 1
   lateralOffset: 0.7
   attackStateNames:
   - Attack_1
   - Attack_2
-  - Kick
+  - Attack_3
   attackCrossfadeDuration: 0.1
-  attackIntervalMin: 2
-  attackIntervalMax: 4
+  attackIntervalMin: 1
+  attackIntervalMax: 3
+  enemyWeapon: {fileID: 2494374917648369681}
   hitTrigger: Hit
   stunTrigger: Stun
   stunEndTrigger: StunEnd
@@ -1092,10 +1093,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 3373335222755966603}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 561cc442a1e96cf47b3c2090181b9a81,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6924746494382128109}
   m_SourcePrefab: {fileID: 100100000, guid: 561cc442a1e96cf47b3c2090181b9a81, type: 3}
 --- !u!4 &2742717185724534550 stripped
 Transform:
@@ -1123,7 +1120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 10
   playerBodyTag: PlayerBody
-  damageCooldown: 0.5
+  damageCooldown: 0.3
 --- !u!65 &3373335222755966603
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1143,29 +1140,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 0
   serializedVersion: 3
-  m_Size: {x: 0.0013802251, y: 0.004614118, z: 0.003715188}
-  m_Center: {x: -8.141687e-11, y: 0.0011908461, z: 0.0040173354}
---- !u!65 &6924746494382128109
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3268423740245415340}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Size: {x: 0.0013802251, y: 0.0013827673, z: 0.008710737}
-  m_Center: {x: -0.000000007429076, y: -0.00042480795, z: -0.0022205755}
+  m_Size: {x: 0.0013802251, y: 0.005437575, z: 0.0037151892}
+  m_Center: {x: 0.000000011890383, y: 0.0016025399, z: 0.0040173363}
 --- !u!1001 &6021620804369335806
 PrefabInstance:
   m_ObjectHideFlags: 0
