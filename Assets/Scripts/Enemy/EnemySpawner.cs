@@ -44,7 +44,6 @@ public class EnemySpawner : MonoBehaviour
     private IEnumerator SpawnWave(Wave wave)
     {
         spawning = true;
-        Debug.Log("Spawning wave: " + wave.name);
 
         foreach (var group in wave.groups)
         {
@@ -75,10 +74,6 @@ public class EnemySpawner : MonoBehaviour
         {
             mover.path = path;
             mover.ladderGoal = ladderGoal;
-        }
-        else
-        {
-            Debug.LogError("Prefab enemy nie ma EnemyMovement!");
         }
     }
 }

@@ -550,7 +550,7 @@ MonoBehaviour:
   - Attack_3
   attackCrossfadeDuration: 0.1
   attackIntervalMin: 0.5
-  attackIntervalMax: 2
+  attackIntervalMax: 1
   enemyWeapon: {fileID: 2494374917648369681}
   hitTrigger: Hit
   stunTrigger: Stun

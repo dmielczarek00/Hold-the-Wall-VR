@@ -78,7 +78,7 @@ public class PlatformRadialMenuItem : MonoBehaviour, IPointerEnterHandler, IPoin
 
         if (icon) icon.sprite = data.icon;
         if (label) label.text = data.displayName;
-        if (costText) costText.text = data.cost + " gold";
+        if (costText) costText.text = data.cost + " Gold";
 
         if (button != null)
         {

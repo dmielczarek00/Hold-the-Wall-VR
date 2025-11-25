@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: a792f82d6de1e7e498140a1dfc90c16d, type: 3}
   prefab: {fileID: 7494973756295120802, guid: 1fd67494f8c74f349be39a56cbeb5815, type: 3}
   description: 
-  cost: 50
+  cost: 1000
   sellPercent: 0.8
   range: 20
   fireRate: 5

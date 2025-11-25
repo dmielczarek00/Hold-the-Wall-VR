@@ -721,7 +721,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   path: {fileID: 0}
   aimPoint: {fileID: 737001342064938674}
-  speed: 2
+  speed: 2.5
   reachDistance: 0.2
   enemyHeight: 1.9
   animator: {fileID: 4338981032145569061}
@@ -751,8 +751,8 @@ MonoBehaviour:
   - Attack_2
   - Attack_3
   attackCrossfadeDuration: 0.1
-  attackIntervalMin: 1
-  attackIntervalMax: 2
+  attackIntervalMin: 0.5
+  attackIntervalMax: 1.5
   enemyWeapon: {fileID: 6257206436280850460}
   hitTrigger: Hit
   stunTrigger: Stun
