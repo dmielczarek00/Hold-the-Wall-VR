@@ -78,7 +78,7 @@ public class PlatformRadialMenuItem : MonoBehaviour, IPointerEnterHandler, IPoin
 
         if (icon) icon.sprite = data.icon;
         if (label) label.text = data.displayName;
-        if (costText) costText.text = data.cost.ToString();
+        if (costText) costText.text = data.cost + " gold";
 
         if (button != null)
         {
@@ -112,12 +112,23 @@ public class PlatformRadialMenuItem : MonoBehaviour, IPointerEnterHandler, IPoin
         var colors = button.colors;
         colors.normalColor = hoverColor;
         button.colors = colors;
+
+        if (!_isCancel && _owner != null && _data != null)
+        {
+            _owner.ShowInfo(_data);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _isHovered = false;
-        if (button == null) return;
+        if (button == null){
+            if (_owner != null)
+            {
+                _owner.HideInfo();
+            }
+            return;
+        }
 
         var colors = button.colors;
         colors.normalColor = _normalColor;

@@ -290,7 +290,7 @@ public class RadialMenu : MonoBehaviour
                         {
                             ShowInfo(next);
                             if (infoDesc)
-                                infoDesc.text = $"Upgrade cost: {current.upgradeCost}";
+                                infoDesc.text = $"Upgrade cost: {current.upgradeCost} Gold";
                         }
                         else
                         {

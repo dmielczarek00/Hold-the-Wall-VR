@@ -66,7 +66,7 @@ public class RadialMenuItem : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         if (icon) icon.sprite = data.icon;
         if (label) label.text = data.displayName;
-        if (costText) costText.text = data.cost.ToString();
+        if (costText) costText.text = data.cost + " Gold";
 
         var colors = button.colors;
         colors.highlightedColor = hoverColor;

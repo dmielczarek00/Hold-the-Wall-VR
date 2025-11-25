@@ -12,15 +12,15 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Zdarzenia")]
     public UnityEvent onDamaged;
-
     public UnityEvent onDeath;
+    public UnityEvent onHealthChanged;
 
     private bool _isDead = false;
 
     private void Awake()
     {
-        // Startowe HP
         currentHealth = maxHealth;
+        onHealthChanged?.Invoke();
     }
 
     /// Zadaje obra¿enia
@@ -33,10 +33,9 @@ public class PlayerHealth : MonoBehaviour
         if (currentHealth < 0f)
             currentHealth = 0f;
 
-        // Event po otrzymaniu obra¿eñ
         onDamaged?.Invoke();
+        onHealthChanged?.Invoke();
 
-        // Sprawdzenie œmierci
         if (currentHealth <= 0f)
         {
             Die();
@@ -48,6 +47,7 @@ public class PlayerHealth : MonoBehaviour
     {
         _isDead = false;
         currentHealth = maxHealth;
+        onHealthChanged?.Invoke();
     }
 
     private void Die()

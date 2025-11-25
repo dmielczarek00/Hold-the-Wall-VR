@@ -98,6 +98,19 @@ public class PlatformRadialMenu : MonoBehaviour
             }
         }
     }
+    public void ShowInfo(PlatformData data)
+    {
+        if (data == null) return;
+
+        if (infoRoot) infoRoot.SetActive(true);
+
+        if (infoTitle) infoTitle.text = data.displayName;   // lub inny tytu³
+        if (infoDesc) infoDesc.text = data.description;   // <-- pole z PlatformData
+    }
+    public void HideInfo()
+    {
+        if (infoRoot) infoRoot.SetActive(false);
+    }
 
     void OnPick(PlatformData data)
     {

@@ -12,6 +12,9 @@ public class EnemyHealth : MonoBehaviour
     public int maxArmor = 0;
     public int currentArmor;
 
+    [Header("Nagroda za zabicie")]
+    public int moneyReward = 10;
+
     // proporcje pancerza
     [Range(0, 100)] public int smallArmorShare = 20;
     [Range(0, 100)] public int mediumArmorShare = 20;
@@ -114,6 +117,12 @@ public class EnemyHealth : MonoBehaviour
     {
         if (IsDead) return;
         IsDead = true;
+
+        // dodaj z³oto
+        if (GameEconomy.I != null)
+        {
+            GameEconomy.I.Add(moneyReward);
+        }
 
         // wy³¹cz ruch
         var move = GetComponent<EnemyMovement>();

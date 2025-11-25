@@ -30,4 +30,4 @@ MonoBehaviour:
   projectileSpeed: 15
   projectileLifeTime: 5
   upgradeTo: {fileID: 11400000, guid: c024fe6a749eb66409b3089fc2c60e9c, type: 2}
-  upgradeCost: 50
+  upgradeCost: 200

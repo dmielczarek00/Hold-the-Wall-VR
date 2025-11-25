@@ -491,10 +491,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ae3b9ab2b2295f4098bba4c5fa40497, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 5
   currentHealth: 0
   maxArmor: 0
   currentArmor: 0
+  moneyReward: 20
   smallArmorShare: 20
   mediumArmorShare: 20
   bigArmorShare: 60
@@ -548,8 +549,8 @@ MonoBehaviour:
   - Attack_2
   - Attack_3
   attackCrossfadeDuration: 0.1
-  attackIntervalMin: 1
-  attackIntervalMax: 3
+  attackIntervalMin: 0.5
+  attackIntervalMax: 2
   enemyWeapon: {fileID: 2494374917648369681}
   hitTrigger: Hit
   stunTrigger: Stun
