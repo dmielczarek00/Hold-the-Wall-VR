@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class EndGameUI : MonoBehaviour
 {
@@ -8,7 +9,9 @@ public class EndGameUI : MonoBehaviour
 
     [Header("UI")]
     public GameObject gameOverPanel;
-    public GameObject victoryPanel;
+
+    [Header("Score")]
+    [SerializeField] private TMP_Text scoreText;
 
     [Header("Sceny")]
     public string mainMenuSceneName;
@@ -40,13 +43,17 @@ public class EndGameUI : MonoBehaviour
         _gameEnded = false;
 
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (victoryPanel != null) victoryPanel.SetActive(false);
     }
 
     public void PlayerDied()
     {
         if (_gameEnded) return;
         _gameEnded = true;
+
+        if (scoreText != null && GameEconomy.I != null)
+        {
+            scoreText.text = GameEconomy.I.totalEarnedMoney.ToString();
+        }
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
@@ -78,18 +85,6 @@ public class EndGameUI : MonoBehaviour
         Time.timeScale = targetScale;
         Time.fixedDeltaTime = BaseFixedDeltaTime * Time.timeScale;
         _slowMoRoutine = null;
-    }
-
-    public void PlayerWon()
-    {
-        if (_gameEnded) return;
-        _gameEnded = true;
-
-        if (victoryPanel != null)
-            victoryPanel.SetActive(true);
-
-        Time.timeScale = 0f;
-        Time.fixedDeltaTime = 0f;
     }
 
     public void RestartLevel()

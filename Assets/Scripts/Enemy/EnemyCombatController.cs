@@ -390,6 +390,7 @@ public class EnemyCombatController : MonoBehaviour
     public void PlayHitReaction(Vector3 worldHitDir)
     {
         if (_animator == null) return;
+        if (_isDead) return;
 
         // awaryjny kierunek, gdyby przyszło coś bez długości
         if (worldHitDir.sqrMagnitude < 0.0001f)

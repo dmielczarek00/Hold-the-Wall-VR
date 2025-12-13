@@ -1,10 +1,10 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    [Header("¯ycie")]
+    [Header("Å»ycie")]
     public int maxHealth = 3;
     public int currentHealth;
 
@@ -20,17 +20,17 @@ public class EnemyHealth : MonoBehaviour
     [Range(0, 100)] public int mediumArmorShare = 20;
     [Range(0, 100)] public int bigArmorShare = 60;
 
-    // fizyczne czêœci pancerza
+    // fizyczne czÄ™Å›ci pancerza
     public List<GameObject> smallArmorPieces = new List<GameObject>();
     public List<GameObject> mediumArmorPieces = new List<GameObject>();
     public List<GameObject> bigArmorPieces = new List<GameObject>();
 
-    // punkty armora przypisane do segmentów
+    // punkty armora przypisane do segmentÃ³w
     private int smallArmorPoints;
     private int mediumArmorPoints;
     private int bigArmorPoints;
 
-    // ile czêœci ju¿ odpad³o
+    // ile czÄ™Å›ci juÅ¼ odpadÅ‚o
     private int smallArmorRemoved = 0;
     private int mediumArmorRemoved = 0;
     private int bigArmorRemoved = 0;
@@ -43,10 +43,32 @@ public class EnemyHealth : MonoBehaviour
 
     void Awake()
     {
+        InitStats();
+    }
+
+    public void ApplyMultipliers(float hpMul, float armorMul, float goldMul)
+    {
+        if (hpMul <= 0f) hpMul = 1f;
+        if (armorMul <= 0f) armorMul = 1f;
+        if (goldMul <= 0f) goldMul = 1f;
+
+        int newHp = Mathf.Max(1, Mathf.RoundToInt(maxHealth * hpMul));
+        int newArmor = Mathf.Max(0, Mathf.RoundToInt(maxArmor * armorMul));
+        int newGold = Mathf.Max(0, Mathf.RoundToInt(moneyReward * goldMul));
+
+        maxHealth = newHp;
+        maxArmor = newArmor;
+        moneyReward = newGold;
+
+        InitStats();
+    }
+
+    private void InitStats()
+    {
         currentHealth = maxHealth;
         currentArmor = maxArmor;
 
-        // przypisanie proporcji do faktycznej iloœci pancerza
+        // przypisanie proporcji do faktycznej iloÅ›ci pancerza
         smallArmorPoints = Mathf.RoundToInt(maxArmor * (smallArmorShare / 100f));
         mediumArmorPoints = Mathf.RoundToInt(maxArmor * (mediumArmorShare / 100f));
         bigArmorPoints = maxArmor - smallArmorPoints - mediumArmorPoints;
@@ -59,11 +81,11 @@ public class EnemyHealth : MonoBehaviour
         // obliczanie penetracji pancerza
         int effectiveArmor = Mathf.Max(0, currentArmor - Mathf.Max(0, armorPenetration));
 
-        // finalne obra¿enia
+        // finalne obraÅ¼enia
         int finalDamage = Mathf.Max(0, damage - effectiveArmor);
         currentHealth -= finalDamage;
 
-        // obliczanie œci¹gania pancerza
+        // obliczanie Å›ciÄ…gania pancerza
         if (shred > 0 && currentArmor > 0)
         {
             currentArmor = Mathf.Max(0, currentArmor - shred);
@@ -118,25 +140,25 @@ public class EnemyHealth : MonoBehaviour
         if (IsDead) return;
         IsDead = true;
 
-        // dodaj z³oto
+        // dodaj zÅ‚oto
         if (GameEconomy.I != null)
         {
             GameEconomy.I.Add(moneyReward);
         }
 
-        // wy³¹cz ruch
+        // wyÂ³Â¹cz ruch
         var move = GetComponent<EnemyMovement>();
         if (move != null) move.enabled = false;
 
-        // wy³¹cz collider
+        // wyÅ‚Ä…cz collider
         var col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
 
-        // animacja œmierci
+        // animacja Å›mierci
         if (animator != null && !string.IsNullOrEmpty(deathTrigger))
             animator.SetTrigger(deathTrigger);
 
-        // usuñ po czasie
+        // usuÅ„ po czasie
         Destroy(gameObject, deathLifetime);
     }
 }

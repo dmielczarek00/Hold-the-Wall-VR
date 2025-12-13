@@ -53,6 +53,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 383c3bd12de6115498d9abed895f576c, type: 2}
   - {fileID: 11400000, guid: ab3f61e2fc23d4944996e00687dee576, type: 2}
   - {fileID: 11400000, guid: 9cb17b8b9614bee4aa5b33a1da9241bc, type: 2}
+  - {fileID: 11400000, guid: 1d35aa139f8b25a4ea4ca5bbbcaf2da8, type: 2}
   spacing: 40
   itemScale: 0.6
   angleOffset: -90

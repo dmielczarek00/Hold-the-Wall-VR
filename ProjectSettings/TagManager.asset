@@ -19,9 +19,9 @@ TagManager:
   - Tower
   - Enemy
   - PlayerWeapon
-  - 
-  - 
-  - 
+  - WeaponSelector
+  - EnemyPlayerCollider
+  - Path
   - 
   - 
   - 

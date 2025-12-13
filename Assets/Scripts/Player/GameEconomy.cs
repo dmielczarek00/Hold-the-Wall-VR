@@ -7,6 +7,7 @@ public class GameEconomy : MonoBehaviour
 {
     public static GameEconomy I;
     public int money = 200;
+    public int totalEarnedMoney = 0;
 
     [Header("Zdarzenia")]
     public UnityEvent onMoneyChanged;
@@ -30,6 +31,7 @@ public class GameEconomy : MonoBehaviour
     public void Add(int amount)
     {
         money += amount;
+        totalEarnedMoney += amount;
         onMoneyChanged?.Invoke();
     }
 }

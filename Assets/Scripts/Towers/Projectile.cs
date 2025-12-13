@@ -30,10 +30,22 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        var health = other.GetComponent<EnemyHealth>();
+        var health = other.GetComponentInParent<EnemyHealth>();
         if (health != null)
         {
             health.TakeDamage(payload.amount, payload.armorPenetration, payload.shred);
+
+            var combat = other.GetComponentInParent<EnemyCombatController>();
+            var movement = other.GetComponentInParent<EnemyMovement>();
+
+            if (combat != null && movement != null && !movement.enabled)
+            {
+                Vector3 hitDir = (other.transform.position - transform.position).normalized;
+                combat.PlayHitReaction(hitDir);
+            }
+
+            Destroy(gameObject);
+            return;
         }
 
         Destroy(gameObject);

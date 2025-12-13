@@ -10,3 +10,6 @@ https://assetstore.unity.com/packages/3d/props/casual-low-poly-tent-pack-created
 
 Climbing animations:
 https://www.mixamo.com/#/?page=1&query=ladder&type=Motion%2CMotionPack
+
+Skybox:
+https://assetstore.unity.com/packages/2d/textures-materials/sky/fantasy-skybox-free-18353

@@ -29,37 +29,69 @@ public class EnemySpawner : MonoBehaviour
     private int currentWave = 0;
     private bool spawning = false;
 
+    public bool IsSpawning => spawning;
+
+    public bool IsDone
+    {
+        get
+        {
+            return !spawning && (waves == null || currentWave >= waves.Length);
+        }
+    }
+
     void Start()
     {
-        if (autoStart && waves.Length > 0)
+        if (autoStart && waves != null && waves.Length > 0)
             StartCoroutine(SpawnWave(waves[currentWave]));
     }
 
-    public void StartNextWave()
+    public void RestartFromWave(int startWaveIndex)
     {
-        if (spawning || currentWave >= waves.Length) return;
-        StartCoroutine(SpawnWave(waves[currentWave]));
+        StopAllCoroutines();
+        spawning = false;
+
+        if (waves == null || waves.Length == 0)
+        {
+            currentWave = 0;
+            return;
+        }
+
+        currentWave = Mathf.Clamp(startWaveIndex, 0, waves.Length);
+
+        if (currentWave < waves.Length)
+            StartCoroutine(SpawnWave(waves[currentWave]));
+    }
+
+    public void SetWavesAndRestart(Wave[] newWaves, int startWaveIndex)
+    {
+        waves = newWaves;
+        RestartFromWave(startWaveIndex);
     }
 
     private IEnumerator SpawnWave(Wave wave)
     {
         spawning = true;
 
-        foreach (var group in wave.groups)
+        if (wave != null && wave.groups != null)
         {
-            for (int i = 0; i < group.count; i++)
+            foreach (var group in wave.groups)
             {
-                SpawnEnemy(group.enemyPrefab);
-                yield return new WaitForSeconds(group.interval);
+                if (group == null || group.enemyPrefab == null) continue;
+
+                for (int i = 0; i < group.count; i++)
+                {
+                    SpawnEnemy(group.enemyPrefab);
+                    yield return new WaitForSeconds(group.interval);
+                }
             }
         }
 
-        yield return new WaitForSeconds(wave.delayAfterWave);
+        yield return new WaitForSeconds(wave != null ? wave.delayAfterWave : 0f);
 
         spawning = false;
         currentWave++;
 
-        if (currentWave < waves.Length)
+        if (waves != null && currentWave < waves.Length)
         {
             StartCoroutine(SpawnWave(waves[currentWave]));
         }
@@ -74,6 +106,14 @@ public class EnemySpawner : MonoBehaviour
         {
             mover.path = path;
             mover.ladderGoal = ladderGoal;
+        }
+
+        var endless = GetComponent<EndlessWaveDirector>();
+        if (endless != null)
+        {
+            var hp = e.GetComponent<EnemyHealth>();
+            if (hp != null)
+                hp.ApplyMultipliers(endless.HpMultiplier, endless.ArmorMultiplier, endless.GoldMultiplier);
         }
     }
 }

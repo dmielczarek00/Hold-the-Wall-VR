@@ -59,6 +59,12 @@ public class Tower : MonoBehaviour
             if (hp != null && hp.IsDead)
                 continue;
 
+            if (e.path == null || e.path.points == null)
+                continue;
+
+            if (e.CurrentIndex < 0 || e.CurrentIndex >= e.path.points.Length)
+                continue;
+
             float dist = Vector3.Distance(transform.position, e.transform.position);
             if (dist < minDist && dist <= useRange)
             {
@@ -73,13 +79,26 @@ public class Tower : MonoBehaviour
     // przewidywanie pozycji przeciwnika
     Vector3 ComputePredictedPos(EnemyMovement enemy, Vector3 aimPosNow, float bulletSpeed)
     {
+        if (enemy == null ||
+            enemy.path == null ||
+            enemy.path.points == null ||
+            enemy.CurrentIndex < 0 ||
+            enemy.CurrentIndex >= enemy.path.points.Length)
+        {
+            return aimPosNow;
+        }
+
         Vector3 r = aimPosNow - firePoint.position;
 
         // kierunek ruchu wroga
         Vector3 bottomNow = enemy.transform.position + Vector3.down * (enemy.enemyHeight * 0.5f);
         Vector3 toWaypoint = enemy.path.points[enemy.CurrentIndex].position - bottomNow;
         toWaypoint.y = 0f;
-        Vector3 enemyDir = toWaypoint.sqrMagnitude > 0.0001f ? toWaypoint.normalized : Vector3.zero;
+
+        Vector3 enemyDir = toWaypoint.sqrMagnitude > 0.0001f
+            ? toWaypoint.normalized
+            : Vector3.zero;
+
         Vector3 v = enemyDir * enemy.speed;
 
         float s = Mathf.Max(0.001f, bulletSpeed);

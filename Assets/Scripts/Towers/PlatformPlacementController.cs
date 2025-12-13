@@ -22,6 +22,7 @@ public class PlatformPlacementController : MonoBehaviour
     [Header("Raycast")]
     public Transform rayOrigin;
     public float maxRayDistance = 50f;
+    public LayerMask placementLayerMask = ~0;
 
     [Header("Ghost")]
     public Material validMaterial;
@@ -53,14 +54,14 @@ public class PlatformPlacementController : MonoBehaviour
     {
         // aktywacja wejœæ XR
         SubscribeActions();
-        EnableActions();
+        //EnableActions();
     }
 
     void OnDisable()
     {
         // czyszczenie wejœæ i ghosta przy wy³¹czeniu
         UnsubscribeActions();
-        DisableActions();
+        //DisableActions();
         CancelPlacement();
     }
 
@@ -153,11 +154,6 @@ public class PlatformPlacementController : MonoBehaviour
     // otwiera menu wyboru platform
     void OpenPlatformMenu()
     {
-        if (platformMenuPrefab == null)
-        {
-            Debug.LogWarning("[PlatformPlacementController] Brak przypisanego prefab PlatformRadialMenu.");
-            return;
-        }
 
         // zamyka inne menu jeœli jest otwarte
         PlatformRadialMenu.CloseAll();
@@ -227,7 +223,7 @@ public class PlatformPlacementController : MonoBehaviour
         if (rayOrigin == null) return;
 
         Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxRayDistance))
+        if (Physics.Raycast(ray, out RaycastHit hit, maxRayDistance, placementLayerMask, QueryTriggerInteraction.Ignore))
         {
             bool tagOk = string.IsNullOrEmpty(_currentAllowedTag) || hit.collider.CompareTag(_currentAllowedTag);
 
@@ -272,7 +268,7 @@ public class PlatformPlacementController : MonoBehaviour
             Vector3 sample = basePos + new Vector3(d.x, 0f, d.y) * radius;
 
             // jeœli punkt nie trafia w BuildArea — platforma za du¿a
-            if (!Physics.Raycast(sample, Vector3.down, out RaycastHit hit, maxDownDistance))
+            if (!Physics.Raycast(sample, Vector3.down, out RaycastHit hit, maxDownDistance, placementLayerMask, QueryTriggerInteraction.Ignore))
                 return false;
 
             if (!string.IsNullOrEmpty(_currentAllowedTag) && !hit.collider.CompareTag(_currentAllowedTag))
@@ -336,10 +332,9 @@ public class PlatformPlacementController : MonoBehaviour
     {
         if (!_canPlaceHere || _currentPlatform == null || _ghostInstance == null) return;
 
-        // sprawdza czy gracza staæ
+        // sprawdza czy gracza staæ na platformê
         if (GameEconomy.I != null && !GameEconomy.I.TrySpend(_currentPlatform.cost))
         {
-            Debug.Log("[PlatformPlacementController] Nie staæ gracza na platformê: " + _currentPlatform.displayName);
             return;
         }
 

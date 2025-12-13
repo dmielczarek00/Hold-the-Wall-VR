@@ -16,12 +16,12 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: a792f82d6de1e7e498140a1dfc90c16d, type: 3}
   prefab: {fileID: 7494973756295120802, guid: 664bbc76bc48b1c4d9d792106d229055, type: 3}
   description: 
-  cost: 200
+  cost: 800
   sellPercent: 0.8
   range: 10
   fireRate: 5
-  armorPenetration: 3
-  shred: 0
+  armorPenetration: 5
+  shred: 2
   accuracy: 0.7
   maxSpreadAngle: 20
   damage: 1
@@ -30,4 +30,4 @@ MonoBehaviour:
   projectileSpeed: 15
   projectileLifeTime: 5
   upgradeTo: {fileID: 11400000, guid: 7eec1f7d9de5f9c4fa471d7f6dfd2fe3, type: 2}
-  upgradeCost: 1000
+  upgradeCost: 2000
