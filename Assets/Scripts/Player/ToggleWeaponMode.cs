@@ -21,10 +21,23 @@ public class ToggleWeaponMode : MonoBehaviour
     [Header("Obiekty do w³¹czenia w trybie kuszy")]
     public GameObject[] enableOnCrossbow;
 
+    [Header("DŸwiêki")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip swordEquipSound;
+    [SerializeField] private AudioClip crossbowEquipSound;
+
     private WeaponMode currentMode = WeaponMode.Build;
 
     public void SetWeaponState(WeaponMode mode)
     {
+        if (mode == currentMode)
+            return;
+
+        if (mode == WeaponMode.Sword)
+            AudioPlay.PlaySound(audioSource, swordEquipSound);
+        else if (mode == WeaponMode.Crossbow)
+            AudioPlay.PlaySound(audioSource, crossbowEquipSound);
+
         currentMode = mode;
 
         bool build = mode == WeaponMode.Build;

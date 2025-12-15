@@ -15,6 +15,10 @@ public class PlayerHealth : MonoBehaviour
     public UnityEvent onDeath;
     public UnityEvent onHealthChanged;
 
+    [Header("DŸwiêki")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] hurtSounds;
+
     private bool _isDead = false;
 
     private void Awake()
@@ -35,6 +39,7 @@ public class PlayerHealth : MonoBehaviour
 
         onDamaged?.Invoke();
         onHealthChanged?.Invoke();
+        AudioPlay.PlaySound(audioSource, hurtSounds);
 
         if (currentHealth <= 0f)
         {

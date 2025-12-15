@@ -11,6 +11,10 @@ public class Tower : MonoBehaviour
     public Transform movingPoint;
     public Transform firePoint;
 
+    [Header("DŸwiêki")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] fireSounds;
+
     private float nextFireTime = 0f;
 
     void Update()
@@ -140,6 +144,7 @@ public class Tower : MonoBehaviour
             source = gameObject
         };
 
+        AudioPlay.PlaySound(audioSource, fireSounds);
         proj.Initialize(finalAimPoint, data.projectileSpeed, data.projectileLifeTime, payload);
     }
 }

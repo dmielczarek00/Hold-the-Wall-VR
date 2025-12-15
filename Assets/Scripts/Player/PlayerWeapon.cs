@@ -15,6 +15,10 @@ public class PlayerWeapon : MonoBehaviour
 
     public float damageCooldown = 0.5f;
 
+    [Header("DŸwiêki")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] slashSounds;
+
     private Vector3 _lastPosition;
     private Vector3 _velocity;
     private bool _isSwinging;
@@ -107,6 +111,7 @@ public class PlayerWeapon : MonoBehaviour
 
             Vector3 hitDir = -swingVel.normalized;
 
+            AudioPlay.PlaySound(audioSource, slashSounds);
             combat.PlayHitReaction(hitDir);
 
             float stunDuration = 0f;

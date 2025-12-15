@@ -49,6 +49,7 @@ public class EnemyCombatController : MonoBehaviour
 
     [SerializeField] private float moveSpeedDampTime = 0.25f;
 
+
     private bool _attackHitWindowActive;
 
     private bool _isStunned;

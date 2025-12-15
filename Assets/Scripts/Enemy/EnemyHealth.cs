@@ -41,6 +41,10 @@ public class EnemyHealth : MonoBehaviour
 
     public bool IsDead { get; private set; }
 
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] hitSounds;
+    [SerializeField] private AudioClip[] deathSounds;
+
     void Awake()
     {
         InitStats();
@@ -83,6 +87,7 @@ public class EnemyHealth : MonoBehaviour
 
         // finalne obrażenia
         int finalDamage = Mathf.Max(0, damage - effectiveArmor);
+        AudioPlay.PlaySound(audioSource, hitSounds);
         currentHealth -= finalDamage;
 
         // obliczanie ściągania pancerza
@@ -92,7 +97,11 @@ public class EnemyHealth : MonoBehaviour
             UpdateArmorPieces();
         }
 
-        if (currentHealth <= 0) Die();
+        if (currentHealth <= 0)
+        {
+            AudioPlay.PlaySound(audioSource, deathSounds);
+            Die();
+        }
     }
 
     private void UpdateArmorPieces()
@@ -146,7 +155,7 @@ public class EnemyHealth : MonoBehaviour
             GameEconomy.I.Add(moneyReward);
         }
 
-        // wy³¹cz ruch
+        // wyłącz ruch
         var move = GetComponent<EnemyMovement>();
         if (move != null) move.enabled = false;
 

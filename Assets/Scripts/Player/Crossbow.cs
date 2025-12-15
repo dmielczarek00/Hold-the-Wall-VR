@@ -19,6 +19,10 @@ public class Crossbow : MonoBehaviour
     [Header("Miejsca na obiekcie")]
     public Transform firePoint;
 
+    [Header("DŸwiêki")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] fireSounds;
+
     private bool _firePressed;
     private float nextFireTime = 0f;
 
@@ -77,6 +81,7 @@ public class Crossbow : MonoBehaviour
 
             Vector3 targetPoint = firePoint.position + firePoint.forward * 999f;
 
+            AudioPlay.PlaySound(audioSource, fireSounds);
             proj.Initialize(targetPoint, projectileSpeed, projectileLifeTime, payload);
         }
     }

@@ -131,7 +131,7 @@ public class Catapult : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Fire");
         else
-            HideStone(); // awaryjnie, jeœli ktoœ nie podpi¹³ animatora
+            HideStone();
     }
 
     public void HideStone()
