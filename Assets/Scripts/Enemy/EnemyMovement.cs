@@ -27,6 +27,15 @@ public class EnemyMovement : MonoBehaviour
 
     private bool _prevRootMotion;
     private bool _didMatchOnExit;
+    void Start()
+    {
+        if (animator != null)
+        {
+            animator.Play("Locomotion", 0, Random.value);
+            animator.Update(0f);
+        }
+    }
+
 
     void Update()
     {

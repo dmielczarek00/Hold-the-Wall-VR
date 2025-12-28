@@ -49,24 +49,14 @@ public class EnemyHealth : MonoBehaviour
     {
         InitStats();
     }
-
-    public void ApplyMultipliers(float hpMul, float armorMul, float goldMul)
+    public void SetBaseStats(int hp, int armor, int gold)
     {
-        if (hpMul <= 0f) hpMul = 1f;
-        if (armorMul <= 0f) armorMul = 1f;
-        if (goldMul <= 0f) goldMul = 1f;
-
-        int newHp = Mathf.Max(1, Mathf.RoundToInt(maxHealth * hpMul));
-        int newArmor = Mathf.Max(0, Mathf.RoundToInt(maxArmor * armorMul));
-        int newGold = Mathf.Max(0, Mathf.RoundToInt(moneyReward * goldMul));
-
-        maxHealth = newHp;
-        maxArmor = newArmor;
-        moneyReward = newGold;
+        maxHealth = Mathf.Max(1, hp);
+        maxArmor = Mathf.Max(0, armor);
+        moneyReward = Mathf.Max(0, gold);
 
         InitStats();
     }
-
     private void InitStats()
     {
         currentHealth = maxHealth;

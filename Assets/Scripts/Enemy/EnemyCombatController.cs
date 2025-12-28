@@ -80,7 +80,6 @@ public class EnemyCombatController : MonoBehaviour
     private static readonly List<EnemyCombatController> _allEnemies =
         new List<EnemyCombatController>();
 
-    // INIT
     void Awake()
     {
         _movement = GetComponent<EnemyMovement>();

@@ -7,6 +7,9 @@ public class EnemyGroup
     public GameObject enemyPrefab;
     public int count;
     public float interval;
+    public int maxHealth = 3;
+    public int maxArmor = 0;
+    public int moneyReward = 10;
 }
 
 [System.Serializable]
@@ -31,13 +34,7 @@ public class EnemySpawner : MonoBehaviour
 
     public bool IsSpawning => spawning;
 
-    public bool IsDone
-    {
-        get
-        {
-            return !spawning && (waves == null || currentWave >= waves.Length);
-        }
-    }
+    public bool IsDone => !spawning && (waves == null || currentWave >= waves.Length);
 
     void Start()
     {
@@ -80,7 +77,7 @@ public class EnemySpawner : MonoBehaviour
 
                 for (int i = 0; i < group.count; i++)
                 {
-                    SpawnEnemy(group.enemyPrefab);
+                    SpawnEnemy(group);
                     yield return new WaitForSeconds(group.interval);
                 }
             }
@@ -97,9 +94,9 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    private void SpawnEnemy(GameObject prefab)
+    private void SpawnEnemy(EnemyGroup group)
     {
-        var e = Instantiate(prefab, transform.position, Quaternion.identity);
+        var e = Instantiate(group.enemyPrefab, transform.position, Quaternion.identity);
 
         var mover = e.GetComponent<EnemyMovement>();
         if (mover != null)
@@ -108,12 +105,10 @@ public class EnemySpawner : MonoBehaviour
             mover.ladderGoal = ladderGoal;
         }
 
-        var endless = GetComponent<EndlessWaveDirector>();
-        if (endless != null)
+        var hp = e.GetComponent<EnemyHealth>();
+        if (hp != null)
         {
-            var hp = e.GetComponent<EnemyHealth>();
-            if (hp != null)
-                hp.ApplyMultipliers(endless.HpMultiplier, endless.ArmorMultiplier, endless.GoldMultiplier);
+            hp.SetBaseStats(group.maxHealth, group.maxArmor, group.moneyReward);
         }
     }
 }
