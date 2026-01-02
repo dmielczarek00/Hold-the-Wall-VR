@@ -17,8 +17,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 0
+    path: Assets/Scenes/Levels/LevelOne/benchmark.unity
+    guid: 99113ec82b608974c951b695fe2ccf52
+  - enabled: 0
+    path: Assets/Scenes/Levels/LevelOne/benchmark_2.unity
+    guid: 9f46adf351d0d1b4b9162f52851d4ab2
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 5ee5916ff32fac048940bcc879ecb650,
       type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: bc7eb96626014ce47a78bf57f6d9ccfb,
+      type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 3255ca5736cc61143a094b2de63ef7ad,
       type: 2}

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyFootsteps : MonoBehaviour
+public class EnemySfx : MonoBehaviour
 {
     [SerializeField] private float runSpeedThreshold = 3f;
 

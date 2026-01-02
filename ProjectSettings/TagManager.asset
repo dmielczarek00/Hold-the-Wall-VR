@@ -22,8 +22,8 @@ TagManager:
   - WeaponSelector
   - EnemyPlayerCollider
   - Path
-  - 
-  - 
+  - BG_CAPTURE
+  - Background
   - 
   - 
   - 

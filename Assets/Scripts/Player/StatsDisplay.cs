@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class UIStatusDisplay : MonoBehaviour
+public class StatsDisplay : MonoBehaviour
 {
     [Header("Referencje")]
     [SerializeField] private PlayerHealth playerHealth;

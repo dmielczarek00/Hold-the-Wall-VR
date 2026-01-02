@@ -63,32 +63,31 @@ public class EnemyMovement : MonoBehaviour
         // spód przeciwnika
         Vector3 bottom = transform.position + Vector3.down * (enemyHeight * 0.5f);
 
-        // kierunek ruchu (wektor do celu)
+        // kierunek ruchu
         Vector3 toTarget = targetPoint.position - bottom;
 
-        // domyślnie stoi
         float moveSpeed = 0f;
 
         if (toTarget.sqrMagnitude > 0.0001f)
         {
             Vector3 dir = toTarget.normalized;
 
-            // przesunięcie po ścieżce
+            // przesunięcie w kieruku kolejnego punktu na ścieżce
             transform.position += dir * speed * Time.deltaTime;
             moveSpeed = speed;
 
-            // obrót w stronę ruchu
+            // obrót w stronę kierunku ruchu
             Quaternion targetRot = Quaternion.LookRotation(dir, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5f);
         }
 
-        // ustaw animację chodzenia
+        // ustawianie animacji chodzenia
         if (animator != null)
         {
             animator.SetFloat("MoveSpeed", moveSpeed);
         }
 
-        // sprawdzanie czy dotarł
+        // sprawdzanie czy przeciwnik dotarł do celu
         if (Vector3.Distance(bottom, targetPoint.position) < reachDistance)
         {
             currentIndex++;
