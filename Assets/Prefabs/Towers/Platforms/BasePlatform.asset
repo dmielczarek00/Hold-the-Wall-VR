@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: e0d435a94a1676d498a0ea3ac1855e0f, type: 3}
   prefab: {fileID: 8188535960985142260, guid: b31505d0203c2b5439b6c3c39c5510da, type: 3}
   description: Can be placed on the ground.
-  cost: 50
+  cost: 100
   allowedTag: BuildArea
   ghostPrefab: {fileID: 0}
   footprintRadius: 0.8

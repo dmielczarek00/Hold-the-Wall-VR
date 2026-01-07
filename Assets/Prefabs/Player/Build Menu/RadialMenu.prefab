@@ -60,7 +60,7 @@ MonoBehaviour:
   menuDistance: 1.5
   menuHeightOffset: 1.8
   minButtonRadius: 120
-  distanceFactor: 0.7
+  distanceFactor: 0.8
   minMenuDistance: 1.5
   distanceThreshold: 10
   infoRoot: {fileID: 1305451907814600173}

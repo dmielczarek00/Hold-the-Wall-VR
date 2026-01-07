@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: a9b79682cbae12044ad6cd0ac40b6b6d, type: 3}
   prefab: {fileID: 2123018025342455844, guid: 22380216d68a8874ca2d6e2564a97459, type: 3}
   description: Can be placed on the stone.
-  cost: 200
+  cost: 50
   allowedTag: Rocks
   ghostPrefab: {fileID: 0}
-  footprintRadius: 0.8
+  footprintRadius: 0.5

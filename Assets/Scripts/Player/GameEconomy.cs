@@ -23,26 +23,6 @@ public class GameEconomy : MonoBehaviour
         onMoneyChanged?.Invoke();
     }
 
-    void Start()
-    {
-        StartCoroutine(CountEnemiesRoutine());
-    }
-
-    IEnumerator CountEnemiesRoutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(enemyCountInterval);
-
-            int currentEnemyCount = FindObjectsOfType<EnemyHealth>().Length;
-
-            if (currentEnemyCount > totalEarnedMoney)
-            {
-                totalEarnedMoney = currentEnemyCount;
-            }
-        }
-    }
-
     public bool CanAfford(int amount) => money >= amount;
 
     public bool TrySpend(int amount)
@@ -57,8 +37,7 @@ public class GameEconomy : MonoBehaviour
     {
         money += amount;
 
-        // STARA LOGIKA – tymczasowo wy³¹czona
-        // totalEarnedMoney += amount;
+        totalEarnedMoney += amount;
 
         onMoneyChanged?.Invoke();
     }
