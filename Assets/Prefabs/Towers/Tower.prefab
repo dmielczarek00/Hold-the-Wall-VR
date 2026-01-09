@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2092408971633941523}
   - component: {fileID: 252159370805028296}
   - component: {fileID: 5445180867924496899}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Leg (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 3294096698940137886}
   - component: {fileID: 5120986545054475290}
   - component: {fileID: 8606818553810997630}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -345,7 +345,7 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders: []
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 9
   m_DistanceCalculationMode: 1
   m_SelectMode: 0
   m_FocusMode: 1
@@ -414,7 +414,7 @@ GameObject:
   - component: {fileID: 4188890029736182896}
   - component: {fileID: 6170920353975339099}
   - component: {fileID: 5085541216854384172}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Leg (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -517,7 +517,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5455748467684615172}
   - component: {fileID: 3656340035286733758}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: SnapPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -561,7 +561,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5803831105481068879}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -601,7 +601,7 @@ GameObject:
   - component: {fileID: 8197632835278527647}
   - component: {fileID: 2994435806982405406}
   - component: {fileID: 4500457618575579945}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Leg (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

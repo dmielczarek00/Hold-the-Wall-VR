@@ -27,6 +27,9 @@ public class ToggleWeaponMode : MonoBehaviour
     [SerializeField] private AudioClip crossbowEquipSound;
 
     private WeaponMode currentMode = WeaponMode.Build;
+    public WeaponMode CurrentMode => currentMode;
+    public bool IsBuildMode => currentMode == WeaponMode.Build;
+
 
     public void SetWeaponState(WeaponMode mode)
     {

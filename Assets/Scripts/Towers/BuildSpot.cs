@@ -36,12 +36,36 @@ public class BuildSpot : MonoBehaviour
 
     private void OnSelectEntered(SelectEnterEventArgs args)
     {
+        if (!IsBuildModeInteractor(args.interactorObject))
+            return;
+
+        if (IsPlatformPreviewActive())
+            return;
+
         OpenMenu();
     }
 
-    private void OpenMenu()
+    private bool IsBuildModeInteractor(object interactorObject)
+    {
+        if (interactorObject is Component c)
+        {
+            var toggle = c.GetComponentInParent<ToggleWeaponMode>();
+            return toggle != null && toggle.IsBuildMode;
+        }
+
+        return false;
+    }
+
+    private bool IsPlatformPreviewActive()
+    {
+        var controller = FindObjectOfType<PlatformPlacementController>();
+        return controller != null && controller.IsPlacing;
+    }
+
+    public void OpenMenu()
     {
         RadialMenu.CloseAll();
+
         if (HasTower)
             BuildManager.I.OpenTowerMenu(this, transform.position + Vector3.up * 2f);
         else

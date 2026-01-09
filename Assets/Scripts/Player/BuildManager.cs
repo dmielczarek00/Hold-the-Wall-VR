@@ -11,14 +11,26 @@ public class BuildManager : MonoBehaviour
 
     void Awake() { I = this; }
 
+    private bool IsPlatformPreviewActive()
+    {
+        var controller = FindObjectOfType<PlatformPlacementController>();
+        return controller != null && controller.IsPlacing;
+    }
+
     public void OpenBuildMenu(BuildSpot spot, Vector3 worldPos)
     {
+        if (IsPlatformPreviewActive()) return;
         if (spot == null) return;
+
         var menu = Instantiate(radialMenuPrefab, worldPos, Quaternion.identity);
         menu.OpenFor(spot);
     }
+
     public void OpenTowerMenu(BuildSpot spot, Vector3 worldPos)
     {
+        if (IsPlatformPreviewActive()) return;
+        if (spot == null) return;
+
         var m = Instantiate(radialMenuPrefab, worldPos, Quaternion.identity);
 
         TowerData current = null;

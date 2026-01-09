@@ -38,6 +38,8 @@ public class PlatformPlacementController : MonoBehaviour
     [Tooltip("Komponent od obrotu gracza (snap/continuous turn). Wy³¹czany w trybie stawiania.")]
     public Behaviour turnProviderToDisable;
 
+    public LayerMask platformBlockMask = ~0;
+
     private PlatformData _currentPlatform;
     private GameObject _ghostInstance;
     private bool _isPlacing;
@@ -49,6 +51,7 @@ public class PlatformPlacementController : MonoBehaviour
 
     private bool _confirmPressed;
     private bool _cancelPressed;
+    public bool IsPlacing => _isPlacing;
 
     void OnEnable()
     {
@@ -182,6 +185,9 @@ public class PlatformPlacementController : MonoBehaviour
         _currentAllowedTag = string.IsNullOrEmpty(data.allowedTag) ? "" : data.allowedTag;
         _footprintRadius = Mathf.Max(0f, data.footprintRadius);
 
+        if (_footprintRadius <= 0.001f)
+            _footprintRadius = EstimatePrefabRadiusXZ(data.prefab);
+
         // wy³¹cza obracanie gracza w tym czasie
         if (turnProviderToDisable != null)
             turnProviderToDisable.enabled = false;
@@ -233,6 +239,7 @@ public class PlatformPlacementController : MonoBehaviour
             _ghostInstance.transform.position = centerPos;
 
             bool insideArea = tagOk && IsInsideBuildAreaXZ(centerPos, _footprintRadius);
+            insideArea = insideArea && !OverlapsOtherPlatformXZ(centerPos, _footprintRadius);
             _canPlaceHere = insideArea;
 
             UpdateGhostVisual(insideArea);
@@ -276,6 +283,33 @@ public class PlatformPlacementController : MonoBehaviour
         }
 
         return true;
+    }
+
+    bool OverlapsOtherPlatformXZ(Vector3 center, float radius)
+    {
+        if (radius <= 0f) return false;
+
+        Vector3 p = center + Vector3.up * 0.5f;
+        float r = Mathf.Max(0.01f, radius);
+
+        var hits = Physics.OverlapSphere(p, r, platformBlockMask, QueryTriggerInteraction.Ignore);
+        return hits != null && hits.Length > 0;
+    }
+
+    float EstimatePrefabRadiusXZ(GameObject prefab)
+    {
+        if (prefab == null) return 0.5f;
+
+        var cols = prefab.GetComponentsInChildren<Collider>(true);
+        if (cols == null || cols.Length == 0) return 0.5f;
+
+        Bounds b = cols[0].bounds;
+        for (int i = 1; i < cols.Length; i++)
+            b.Encapsulate(cols[i].bounds);
+
+        float rX = b.extents.x;
+        float rZ = b.extents.z;
+        return Mathf.Max(rX, rZ);
     }
 
     // zmienia materia³ ghosta w zale¿noœci od mo¿liwoœci postawienia
@@ -333,15 +367,15 @@ public class PlatformPlacementController : MonoBehaviour
         if (!_canPlaceHere || _currentPlatform == null || _ghostInstance == null) return;
 
         // sprawdza czy gracza staæ na platformê
-        if (GameEconomy.I != null && !GameEconomy.I.TrySpend(_currentPlatform.cost))
-        {
-            return;
-        }
+        if (GameEconomy.I != null && !GameEconomy.I.TrySpend(_currentPlatform.cost)) return;
 
         GameObject placed = Instantiate(_currentPlatform.prefab, _ghostInstance.transform.position, _ghostInstance.transform.rotation);
         placed.name = _currentPlatform.prefab.name;
 
         CancelPlacement();
+
+        var spot = placed.GetComponentInChildren<BuildSpot>(includeInactive: true);
+        spot.OpenMenu();
     }
 
     // koñczy tryb stawiania i sprz¹ta po sobie

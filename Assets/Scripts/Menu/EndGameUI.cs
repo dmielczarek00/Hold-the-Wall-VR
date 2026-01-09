@@ -12,6 +12,7 @@ public class EndGameUI : MonoBehaviour
 
     [Header("Score")]
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text highScoreText;
 
     [Header("Sceny")]
     public string mainMenuSceneName;
@@ -25,7 +26,9 @@ public class EndGameUI : MonoBehaviour
 
     private bool _gameEnded;
     private Coroutine _slowMoRoutine;
-    private const float BaseFixedDeltaTime = 0.02f; // domyœlne Unity
+    private const float BaseFixedDeltaTime = 0.02f;
+
+    private const string HighScoreKey = "HighScore";
 
     private void Awake()
     {
@@ -50,15 +53,34 @@ public class EndGameUI : MonoBehaviour
         if (_gameEnded) return;
         _gameEnded = true;
 
-        if (scoreText != null && GameEconomy.I != null)
+        int score = 0;
+
+        if (GameEconomy.I != null)
+            score = GameEconomy.I.totalEarnedMoney;
+
+        if (scoreText != null)
+            scoreText.text = score.ToString();
+
+        int highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
+        bool isNewHighScore = score > highScore;
+
+        if (isNewHighScore)
         {
-            scoreText.text = GameEconomy.I.totalEarnedMoney.ToString();
+            PlayerPrefs.SetInt(HighScoreKey, score);
+            PlayerPrefs.Save();
+        }
+
+        if (highScoreText != null)
+        {
+            if (isNewHighScore)
+                highScoreText.text = "New High Score!";
+            else
+                highScoreText.text = "High Score: " + highScore.ToString();
         }
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
 
-        // p³ynne zwalnianie czasu
         if (_slowMoRoutine != null)
             StopCoroutine(_slowMoRoutine);
 
