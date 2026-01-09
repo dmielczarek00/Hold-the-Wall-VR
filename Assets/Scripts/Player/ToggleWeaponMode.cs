@@ -30,7 +30,10 @@ public class ToggleWeaponMode : MonoBehaviour
     public WeaponMode CurrentMode => currentMode;
     public bool IsBuildMode => currentMode == WeaponMode.Build;
 
-
+    public void SetBuildMode()
+    {
+        SetWeaponState(WeaponMode.Build);
+    }
     public void SetWeaponState(WeaponMode mode)
     {
         if (mode == currentMode)
